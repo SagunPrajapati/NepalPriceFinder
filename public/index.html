@@ -9,21 +9,6 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0a0c0f;--bg2:#111418;--bg3:#181c22;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--text:#f0ede8;--text2:#9a9590;--text3:#5a5652;--accent:#e8c547;--green:#4ade80;--red:#f87171;--blue:#60a5fa;--radius:12px;--font:'Sora',sans-serif;--mono:'JetBrains Mono',monospace}
 body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
-#loginOverlay{position:fixed;inset:0;z-index:1000;background:rgba(10,12,15,0.97);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:20px}
-.login-box{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:40px 36px;width:100%;max-width:380px;text-align:center}
-.login-logo{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--accent);text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:8px}
-.login-logo::before,.login-logo::after{content:'';width:28px;height:1px;background:var(--accent);opacity:.4}
-.login-box h2{font-size:22px;font-weight:700;margin-bottom:6px}
-.login-box p{font-size:13px;color:var(--text2);margin-bottom:28px;line-height:1.5}
-.pw-wrap{position:relative;margin-bottom:16px}
-.pw-wrap input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:13px 44px 13px 16px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:border-color .2s}
-.pw-wrap input:focus{border-color:var(--accent)}
-.pw-wrap input::placeholder{color:var(--text3)}
-.pw-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px}
-.login-btn{width:100%;padding:13px;background:var(--accent);color:#0a0c0f;font-family:var(--font);font-size:14px;font-weight:600;border:none;border-radius:10px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
-.login-btn:hover:not(:disabled){background:#f0d060;transform:translateY(-1px)}
-.login-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.login-err{font-size:12px;color:var(--red);font-family:var(--mono);margin-top:12px;min-height:18px}
 .ticker-wrap{background:linear-gradient(90deg,#1a1400,#1f1800,#1a1400);border-bottom:1px solid rgba(232,197,71,0.2);overflow:hidden;height:38px;display:flex;align-items:center;position:relative}
 .ticker-wrap::before,.ticker-wrap::after{content:'';position:absolute;top:0;width:60px;height:100%;z-index:2}
 .ticker-wrap::before{left:0;background:linear-gradient(90deg,#1a1400,transparent)}
@@ -44,6 +29,7 @@ h1{font-size:clamp(28px,5vw,50px);font-weight:700;letter-spacing:-.03em;line-hei
 h1 span{color:var(--accent)}.subtitle{color:var(--text2);font-size:14px;font-weight:300;line-height:1.6}
 .search-wrap{max-width:760px;margin:40px auto 0;padding:0 20px}
 .search-card{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:28px;position:relative;overflow:hidden}
+.search-card::before{content:'';position:absolute;top:-100px;right:-100px;width:260px;height:260px;background:radial-gradient(circle,rgba(232,197,71,0.05) 0%,transparent 70%);pointer-events:none}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .field{display:flex;flex-direction:column;gap:7px}
 .field label{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);font-family:var(--mono)}
@@ -52,7 +38,7 @@ h1 span{color:var(--accent)}.subtitle{color:var(--text2);font-size:14px;font-wei
 .field input:focus,.field select:focus{border-color:var(--accent);background:#1a1e26}
 .field input::placeholder{color:var(--text3)}.full-row{grid-column:1/-1}
 .search-btn{width:100%;margin-top:4px;padding:15px;background:var(--accent);color:#0a0c0f;font-family:var(--font);font-size:15px;font-weight:600;border:none;border-radius:12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
-.search-btn:hover:not(:disabled){background:#f0d060;transform:translateY(-1px)}
+.search-btn:hover:not(:disabled){background:#f0d060;transform:translateY(-1px);box-shadow:0 8px 24px rgba(232,197,71,0.2)}
 .search-btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
 .results-wrap{max-width:760px;margin:32px auto 60px;padding:0 20px}
 .results-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
@@ -64,6 +50,7 @@ h1 span{color:var(--accent)}.subtitle{color:var(--text2);font-size:14px;font-wei
 .price-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:border-color .2s,transform .15s;animation:slideIn .3s ease both}
 .price-card:hover{border-color:var(--border2);transform:translateX(3px)}
 .price-card.cheapest{border-color:rgba(74,222,128,.4);background:linear-gradient(135deg,var(--bg2),rgba(74,222,128,.04))}
+.price-card.priciest{border-color:rgba(248,113,113,.2)}
 @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 .rank-num{font-family:var(--mono);font-size:13px;color:var(--text3);min-width:22px;text-align:center}
@@ -78,11 +65,10 @@ h1 span{color:var(--accent)}.subtitle{color:var(--text2);font-size:14px;font-wei
 .tag-neutral{background:rgba(255,255,255,.05);color:var(--text3);border:1px solid var(--border)}
 .store-note{font-size:12px;color:var(--text3);margin-top:5px;line-height:1.5}
 .price-section{text-align:right;flex-shrink:0}
-.price-val{font-size:20px;font-weight:700;font-family:var(--mono);color:var(--text)}
-.price-val.green{color:var(--green)}.price-orig{font-size:11px;color:var(--text3);text-decoration:line-through;font-family:var(--mono);margin-top:1px}
+.price-val{font-size:20px;font-weight:700;font-family:var(--mono);color:var(--text)}.price-val.green{color:var(--green)}
+.price-orig{font-size:11px;color:var(--text3);text-decoration:line-through;font-family:var(--mono);margin-top:1px}
 .disc-badge{font-size:10px;background:rgba(232,197,71,.15);color:var(--accent);padding:1px 6px;border-radius:4px;font-family:var(--mono);display:inline-block;margin-top:2px}
-.visit-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--accent);text-decoration:none;margin-top:5px;opacity:.8}
-.visit-link:hover{opacity:1}
+.visit-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--accent);text-decoration:none;margin-top:5px;opacity:.8}.visit-link:hover{opacity:1}
 .loading-state{text-align:center;padding:60px 20px}
 .loading-dots{display:flex;justify-content:center;gap:6px;margin-bottom:16px}
 .loading-dots span{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.2s ease-in-out infinite}
@@ -97,32 +83,30 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--text3);font-fam
 </style>
 </head>
 <body>
-<div id="loginOverlay">
-  <div class="login-box">
-    <div class="login-logo">Nepal Price Finder</div>
-    <h2>Welcome Back</h2>
-    <p>Enter your password to access<br/>Nepal's price comparison tool</p>
-    <div class="pw-wrap">
-      <input type="password" id="pwInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"/>
-      <button class="pw-toggle" onclick="togglePw()" id="pwToggleBtn">👁</button>
+
+<!-- OFFERS TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-label">🔥 Live Deals</div>
+  <div class="ticker-track">
+    <div class="ticker-inner" id="tickerInner">
+      <div class="ticker-item"><span class="ti-dot">●</span><span class="ti-store">Loading offers...</span></div>
     </div>
-    <button class="login-btn" id="loginBtn" onclick="doLogin()">
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      Unlock
-    </button>
-    <div class="login-err" id="loginErr"></div>
   </div>
 </div>
-<div class="ticker-wrap"><div class="ticker-label">🔥 Live Deals</div><div class="ticker-track"><div class="ticker-inner" id="tickerInner"><div class="ticker-item"><span class="ti-dot">●</span><span class="ti-store">Loading offers...</span></div></div></div></div>
+
+<!-- HEADER -->
 <header class="header">
   <div class="logo-tag">Nepal Price Finder</div>
   <h1>Find the <span>Cheapest</span> Price<br/>Across Nepal's Web</h1>
   <p class="subtitle">Compare prices from Daraz, SastoDeal, Gyapu, Electromandu & more<br/>Sorted lowest to highest — click any result to buy</p>
 </header>
+
+<!-- SEARCH -->
 <div class="search-wrap">
   <div class="search-card">
     <div class="field-row">
-      <div class="field"><label>Product Category</label>
+      <div class="field">
+        <label>Product Category</label>
         <select id="category">
           <option value="">— Select Category —</option>
           <option>Refrigerator</option><option>Washing Machine</option><option>Television / TV</option>
@@ -132,7 +116,8 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--text3);font-fam
           <option>Camera</option><option>Tablet</option><option>Printer</option><option>Other</option>
         </select>
       </div>
-      <div class="field"><label>Brand</label>
+      <div class="field">
+        <label>Brand</label>
         <select id="brand">
           <option value="">— Any Brand —</option>
           <option>Samsung</option><option>LG</option><option>Sony</option><option>Panasonic</option>
@@ -142,7 +127,8 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--text3);font-fam
           <option>Himstar</option><option>Other</option>
         </select>
       </div>
-      <div class="field full-row"><label>Model / Description — be specific for best results</label>
+      <div class="field full-row">
+        <label>Model / Description — be specific for best results</label>
         <input type="text" id="model" placeholder="e.g. RR20C20C2RH 192L,  Galaxy S24 256GB,  55 inch 4K OLED..."/>
       </div>
     </div>
@@ -152,6 +138,8 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--text3);font-fam
     </button>
   </div>
 </div>
+
+<!-- RESULTS -->
 <div class="results-wrap" id="resultsWrap" style="display:none">
   <div class="results-header">
     <span class="results-title" id="resultsTitle">RESULTS</span>
@@ -160,98 +148,130 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--text3);font-fam
   <div id="resultsBody"></div>
   <div class="notice" id="notice" style="display:none"></div>
 </div>
+
 <footer>मूल्य खोज &nbsp;·&nbsp; Powered by Groq AI &nbsp;·&nbsp; Always verify price on seller's site before purchase</footer>
+
 <script>
-let _tok=null;
-function togglePw(){const i=document.getElementById('pwInput'),b=document.getElementById('pwToggleBtn');i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'👁':'🙈';}
-async function doLogin(){
-  const pw=document.getElementById('pwInput').value,btn=document.getElementById('loginBtn'),err=document.getElementById('loginErr');
-  if(!pw){err.textContent='Please enter the password.';return;}
-  btn.disabled=true;btn.innerHTML='<span style="width:14px;height:14px;border:2px solid #0a0c0f;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span> Checking...';err.textContent='';
-  try{
-    const res=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw})});
-    const data=await res.json();
-    if(!res.ok)throw new Error(data.error||'Login failed');
-    _tok=data.token;
-    document.getElementById('loginOverlay').style.display='none';
-    loadOffers();
-  }catch(e){err.textContent=e.message||'Incorrect password.';document.getElementById('pwInput').value='';}
-  btn.disabled=false;btn.innerHTML='<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Unlock';
-}
-async function loadOffers(){
-  try{
-    const res=await fetch('/api/offers',{method:'POST',headers:{'Content-Type':'application/json','x-session-token':_tok}});
-    const data=await res.json();
-    if(data.offers)renderTicker(data.offers);
-  }catch(e){renderTicker(getFallbackOffers());}
-}
-function getFallbackOffers(){return[{store:'Daraz',product:'Samsung Galaxy A55',original_price:49999,sale_price:42999,discount_pct:14,tag:'SALE'},{store:'SastoDeal',product:'LG 32" Smart TV',original_price:55000,sale_price:46900,discount_pct:15,tag:'HOT'},{store:'Gyapu',product:'Realme C65 5G',original_price:28000,sale_price:23999,discount_pct:14,tag:'NEW'},{store:'Electromandu',product:'Samsung 192L Fridge',original_price:35590,sale_price:32990,discount_pct:7,tag:'DEAL'},{store:'Magic Mart',product:'Whirlpool Washer 7kg',original_price:62000,sale_price:54500,discount_pct:12,tag:'SALE'},{store:'Kinaun',product:'Sony WH-1000XM5',original_price:45000,sale_price:38000,discount_pct:16,tag:'HOT'}];}
-function renderTicker(offers){
-  if(!offers?.length)return;
-  const doubled=[...offers,...offers];
-  const html=doubled.map(o=>`<div class="ticker-item"><span class="ti-dot">●</span><span class="ti-store">${o.store}</span><span style="color:var(--text2)">${o.product}</span><span class="ti-price">Rs.${Number(o.sale_price).toLocaleString()}</span>${o.discount_pct?`<span class="ti-disc">-${o.discount_pct}%</span>`:''}  </div>`).join('');
-  const inner=document.getElementById('tickerInner');
-  inner.innerHTML=html;
-  inner.addEventListener('mouseenter',()=>inner.classList.add('paused'));
-  inner.addEventListener('mouseleave',()=>inner.classList.remove('paused'));
-}
-const MSGS=['Searching Daraz Nepal...','Checking SastoDeal...','Scanning Gyapu...','Looking up Electromandu...','Fetching Kinaun prices...','Checking Samsung Plaza...','Scanning Magic Mart...','Sorting by price...'];
+// Loading messages
+const MSGS = ['Searching Daraz Nepal...','Checking SastoDeal...','Scanning Gyapu...','Looking up Electromandu...','Fetching Kinaun prices...','Checking Samsung Plaza...','Scanning Magic Mart...','Sorting by price...'];
 let msgTimer;
-function startLoading(){
-  document.getElementById('resultsWrap').style.display='block';
-  document.getElementById('resultsTitle').textContent='SEARCHING';
-  document.getElementById('resultsCount').textContent='';
-  document.getElementById('notice').style.display='none';
-  let i=0;
-  document.getElementById('resultsBody').innerHTML='<div class="loading-state"><div class="loading-dots"><span></span><span></span><span></span></div><div class="loading-text" id="loadMsg">'+MSGS[0]+'</div></div>';
-  msgTimer=setInterval(()=>{i=(i+1)%MSGS.length;const el=document.getElementById('loadMsg');if(el)el.textContent=MSGS[i];},900);
+
+function startLoading() {
+  document.getElementById('resultsWrap').style.display = 'block';
+  document.getElementById('resultsTitle').textContent = 'SEARCHING';
+  document.getElementById('resultsCount').textContent = '';
+  document.getElementById('notice').style.display = 'none';
+  let i = 0;
+  document.getElementById('resultsBody').innerHTML = '<div class="loading-state"><div class="loading-dots"><span></span><span></span><span></span></div><div class="loading-text" id="loadMsg">' + MSGS[0] + '</div></div>';
+  msgTimer = setInterval(() => { i = (i+1) % MSGS.length; const el = document.getElementById('loadMsg'); if(el) el.textContent = MSGS[i]; }, 900);
 }
-function stopLoading(){clearInterval(msgTimer);}
-async function doSearch(){
-  if(!_tok){document.getElementById('loginOverlay').style.display='flex';return;}
-  const category=document.getElementById('category').value,brand=document.getElementById('brand').value,model=document.getElementById('model').value.trim();
-  if(!category&&!brand&&!model){alert('Please select a category or brand, or enter a model name.');return;}
-  const btn=document.getElementById('searchBtn');
-  btn.disabled=true;btn.innerHTML='<span style="width:16px;height:16px;border:2px solid #0a0c0f;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span>&nbsp;Searching...';
-  startLoading();
-  const product=[brand,category,model].filter(Boolean).join(' ');
-  try{
-    const res=await fetch('/api/search',{method:'POST',headers:{'Content-Type':'application/json','x-session-token':_tok},body:JSON.stringify({product})});
-    const data=await res.json();
-    stopLoading();
-    if(res.status===401){_tok=null;document.getElementById('loginOverlay').style.display='flex';return;}
-    if(!res.ok)throw new Error(data.error||'Search failed');
-    renderResults(data.results||[],product);
-  }catch(err){
-    stopLoading();
-    document.getElementById('resultsBody').innerHTML='<div class="empty-state"><div style="font-size:36px;margin-bottom:12px">⚠️</div><div style="color:var(--red);font-weight:600;margin-bottom:8px">Search failed</div><div style="font-size:13px;font-family:var(--mono)">'+err.message+'</div></div>';
+function stopLoading() { clearInterval(msgTimer); }
+
+// Load ticker offers on page load
+async function loadOffers() {
+  try {
+    const res = await fetch('/api/offers', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+    const data = await res.json();
+    if (data.offers) renderTicker(data.offers);
+  } catch(e) {
+    renderTicker([
+      {store:'Daraz',product:'Samsung Galaxy A55',original_price:49999,sale_price:42999,discount_pct:14,tag:'SALE'},
+      {store:'SastoDeal',product:'LG 32" Smart TV',original_price:55000,sale_price:46900,discount_pct:15,tag:'HOT'},
+      {store:'Gyapu',product:'Realme C65 5G',original_price:28000,sale_price:23999,discount_pct:14,tag:'NEW'},
+      {store:'Electromandu',product:'Samsung 192L Fridge',original_price:35590,sale_price:32990,discount_pct:7,tag:'DEAL'},
+      {store:'Magic Mart',product:'Whirlpool Washer 7kg',original_price:62000,sale_price:54500,discount_pct:12,tag:'SALE'},
+      {store:'Kinaun',product:'Sony WH-1000XM5',original_price:45000,sale_price:38000,discount_pct:16,tag:'HOT'},
+    ]);
   }
-  btn.disabled=false;btn.innerHTML='<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Search Prices in Nepal';
 }
-function renderResults(results,query){
-  const body=document.getElementById('resultsBody');
-  if(!Array.isArray(results)||results.length===0){body.innerHTML='<div class="empty-state"><div style="font-size:36px;margin-bottom:12px">🔍</div><div>No results found.<br/>Try a more specific model name or brand.</div></div>';return;}
-  results.sort((a,b)=>(Number(a.price)||0)-(Number(b.price)||0));
-  const prices=results.map(r=>Number(r.price)).filter(p=>p>0);
-  const minP=Math.min(...prices),maxP=Math.max(...prices),savings=maxP-minP;
-  document.getElementById('resultsTitle').textContent='RESULTS FOR';
-  document.getElementById('resultsCount').textContent=results.length+' STORES · '+query.toUpperCase();
-  let html='';
-  if(results.length>1&&savings>0)html+='<div class="savings-bar"><div class="sav-item"><div class="sav-label">Cheapest</div><div class="sav-val" style="color:var(--green)">Rs.'+minP.toLocaleString()+'</div></div><div class="sav-item"><div class="sav-label">Most expensive</div><div class="sav-val" style="color:var(--red)">Rs.'+maxP.toLocaleString()+'</div></div><div class="sav-item"><div class="sav-label">You save up to</div><div class="sav-val" style="color:var(--accent)">Rs.'+savings.toLocaleString()+'</div></div><div class="sav-item"><div class="sav-label">Stores found</div><div class="sav-val" style="color:var(--text2)">'+results.length+'</div></div></div>';
-  results.forEach((r,i)=>{
-    const price=Number(r.price)||0,origP=Number(r.original_price)||0,cheap=price===minP,hasD=origP>price,discPct=hasD?Math.round((1-price/origP)*100):0;
-    const tagHtml=(r.tags||[]).map(t=>{const tl=t.toLowerCase();if(tl.includes('official')||tl.includes('authorized'))return '<span class="tag tag-official">'+t+'</span>';if(tl.includes('cod')||tl.includes('delivery'))return '<span class="tag tag-cod">'+t+'</span>';if(tl.includes('discount')||tl.includes('sale'))return '<span class="tag tag-deal">'+t+'</span>';return '<span class="tag tag-neutral">'+t+'</span>';}).join('');
-    const cheapTag=cheap?'<span class="tag tag-cod">✓ Cheapest</span>':'';
-    const rankIcon=['①','②','③','④','⑤','⑥','⑦'][i]||(i+1)+'';
-    let safeUrl=(r.url||'').startsWith('http')?r.url:(r.url?'https://'+r.url:'#');
-    let hostname='';try{hostname=new URL(safeUrl).hostname;}catch(e){}
-    html+='<div class="price-card '+(cheap?'cheapest':'')+'" style="animation-delay:'+(i*0.05)+'s" onclick="window.open(\'' +safeUrl+ '\',' + "'" + '_blank' + "'" + ')"><div class="rank-num '+(i===0?'first':'')+'">'+rankIcon+'</div><div class="store-info"><div class="store-name">'+(r.store||'Store')+'</div><div class="store-url">'+hostname+'</div><div class="store-tags">'+tagHtml+cheapTag+'</div>'+(r.note?'<div class="store-note">'+r.note+'</div>':'')+'</div><div class="price-section"><div class="price-val '+(cheap?'green':'')+'">Rs.'+price.toLocaleString()+'</div>'+(hasD?'<div class="price-orig">Rs.'+origP.toLocaleString()+'</div><div class="disc-badge">-'+discPct+'%</div>':'')+'<a class="visit-link" href="'+safeUrl+'" target="_blank" onclick="event.stopPropagation()">Visit store →</a></div></div>';
+
+function renderTicker(offers) {
+  if (!offers?.length) return;
+  const doubled = [...offers, ...offers];
+  const html = doubled.map(o => '<div class="ticker-item"><span class="ti-dot">\u25cf</span><span class="ti-store">' + o.store + '</span><span style="color:var(--text2)">' + o.product + '</span><span class="ti-price">Rs.' + Number(o.sale_price).toLocaleString() + '</span>' + (o.discount_pct ? '<span class="ti-disc">-' + o.discount_pct + '%</span>' : '') + '</div>').join('');
+  const inner = document.getElementById('tickerInner');
+  inner.innerHTML = html;
+  inner.addEventListener('mouseenter', () => inner.classList.add('paused'));
+  inner.addEventListener('mouseleave', () => inner.classList.remove('paused'));
+}
+
+// Main search - calls backend, no auth needed
+async function doSearch() {
+  const category = document.getElementById('category').value;
+  const brand    = document.getElementById('brand').value;
+  const model    = document.getElementById('model').value.trim();
+  if (!category && !brand && !model) { alert('Please select a category or brand, or enter a model name.'); return; }
+
+  const btn = document.getElementById('searchBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span style="width:16px;height:16px;border:2px solid #0a0c0f;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span>&nbsp;Searching...';
+  startLoading();
+
+  const product = [brand, category, model].filter(Boolean).join(' ');
+
+  try {
+    const res  = await fetch('/api/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ product })
+    });
+    const data = await res.json();
+    stopLoading();
+    if (!res.ok) throw new Error(data.error || 'Search failed');
+    renderResults(data.results || [], product);
+  } catch(err) {
+    stopLoading();
+    document.getElementById('resultsBody').innerHTML = '<div class="empty-state"><div style="font-size:36px;margin-bottom:12px">\u26a0\ufe0f</div><div style="color:var(--red);font-weight:600;margin-bottom:8px">Search failed</div><div style="font-size:13px;font-family:var(--mono)">' + (err.message||'Please try again.') + '</div></div>';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Search Prices in Nepal';
+}
+
+function renderResults(results, query) {
+  const body = document.getElementById('resultsBody');
+  if (!Array.isArray(results) || results.length === 0) {
+    body.innerHTML = '<div class="empty-state"><div style="font-size:36px;margin-bottom:12px">\ud83d\udd0d</div><div>No results found.<br/>Try a more specific model name or brand.</div></div>';
+    return;
+  }
+  results.sort((a,b) => (Number(a.price)||0) - (Number(b.price)||0));
+  const prices = results.map(r => Number(r.price)).filter(p => p > 0);
+  const minP = Math.min(...prices), maxP = Math.max(...prices), savings = maxP - minP;
+  document.getElementById('resultsTitle').textContent = 'RESULTS FOR';
+  document.getElementById('resultsCount').textContent = results.length + ' STORES \u00b7 ' + query.toUpperCase();
+  let html = '';
+  if (results.length > 1 && savings > 0) {
+    html += '<div class="savings-bar"><div class="sav-item"><div class="sav-label">Cheapest</div><div class="sav-val" style="color:var(--green)">Rs.' + minP.toLocaleString() + '</div></div><div class="sav-item"><div class="sav-label">Most expensive</div><div class="sav-val" style="color:var(--red)">Rs.' + maxP.toLocaleString() + '</div></div><div class="sav-item"><div class="sav-label">You save up to</div><div class="sav-val" style="color:var(--accent)">Rs.' + savings.toLocaleString() + '</div></div><div class="sav-item"><div class="sav-label">Stores found</div><div class="sav-val" style="color:var(--text2)">' + results.length + '</div></div></div>';
+  }
+  results.forEach((r, i) => {
+    const price = Number(r.price)||0, origP = Number(r.original_price)||0;
+    const cheap = price === minP, pricey = price === maxP && results.length > 1;
+    const hasD = origP > price, discPct = hasD ? Math.round((1-price/origP)*100) : 0;
+    const tagHtml = (r.tags||[]).map(t => {
+      const tl = t.toLowerCase();
+      if(tl.includes('official')||tl.includes('authorized')) return '<span class="tag tag-official">'+t+'</span>';
+      if(tl.includes('cod')||tl.includes('delivery')) return '<span class="tag tag-cod">'+t+'</span>';
+      if(tl.includes('discount')||tl.includes('sale')) return '<span class="tag tag-deal">'+t+'</span>';
+      return '<span class="tag tag-neutral">'+t+'</span>';
+    }).join('') + (cheap ? '<span class="tag tag-cod">\u2713 Cheapest</span>' : '');
+    const rankIcon = ['\u2460','\u2461','\u2462','\u2463','\u2464','\u2465','\u2466'][i] || (i+1)+'';
+    let safeUrl = (r.url||'').startsWith('http') ? r.url : (r.url ? 'https://'+r.url : '#');
+    let hostname = ''; try { hostname = new URL(safeUrl).hostname; } catch(e) {}
+    html += '<div class="price-card '+(cheap?'cheapest':pricey?'priciest':'')+'" style="animation-delay:'+(i*0.05)+'s" onclick="window.open(this.dataset.url,\'_blank\')" data-url="'+safeUrl+'">'
+      + '<div class="rank-num '+(i===0?'first':'')+'">'+rankIcon+'</div>'
+      + '<div class="store-info"><div class="store-name">'+(r.store||'Store')+'</div><div class="store-url">'+hostname+'</div>'
+      + '<div class="store-tags">'+tagHtml+'</div>'+(r.note?'<div class="store-note">'+r.note+'</div>':'')+'</div>'
+      + '<div class="price-section"><div class="price-val '+(cheap?'green':'')+'">Rs.'+price.toLocaleString()+'</div>'
+      + (hasD?'<div class="price-orig">Rs.'+origP.toLocaleString()+'</div><div class="disc-badge">-'+discPct+'%</div>':'')
+      + '<a class="visit-link" href="'+safeUrl+'" target="_blank" onclick="event.stopPropagation()">Visit store \u2192</a></div></div>';
   });
-  body.innerHTML=html;
-  const notice=document.getElementById('notice');notice.style.display='block';
-  notice.textContent='⚠ Prices are based on AI knowledge and may not reflect real-time availability. Always verify on the seller website before purchasing.';
+  body.innerHTML = html;
+  const notice = document.getElementById('notice');
+  notice.style.display = 'block';
+  notice.textContent = '\u26a0 Prices are based on AI knowledge and may not reflect real-time availability. Always verify on the seller website before purchasing.';
 }
-document.addEventListener('keydown',e=>{if(e.key==='Enter'){if(document.getElementById('loginOverlay').style.display!=='none')doLogin();else doSearch();}});
+
+document.addEventListener('keydown', e => { if(e.key==='Enter') doSearch(); });
+window.addEventListener('load', loadOffers);
 </script>
 </body>
 </html>
