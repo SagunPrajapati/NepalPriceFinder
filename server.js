@@ -1,7 +1,8 @@
 /**
  * Nepal Price Finder — Secure Backend
- * - Groq API key never exposed to browser
- * - /api/search and /api/offers are PUBLIC
+ * - Groq API key stored only here, never sent to browser
+ * - /api/search and /api/offers are PUBLIC (no auth needed)
+ * - /api/banner-offers fetches deals from Daraz, Jeeva, HamroBazaar
  * - /admin requires password (sabina#7)
  */
 
@@ -16,34 +17,27 @@ const PORT = process.env.PORT || 3000;
 
 // ── In-memory stats tracker ───────────────────────────────────
 const stats = {
-  totalSearches: 0,
+  totalSearches:  0,
   totalOfferLoads: 0,
   serverStartTime: new Date(),
-  recentSearches: [],       // last 50 searches
-  popularProducts: {},      // product -> count
-  popularCategories: {},    // category -> count
-  hourlySearches: {},       // "YYYY-MM-DD HH" -> count
+  recentSearches:  [],
+  popularProducts: {},
+  hourlySearches:  {},
   errors: 0,
 };
 
 function trackSearch(product) {
   stats.totalSearches++;
-  const entry = { product, time: new Date().toISOString(), };
-  stats.recentSearches.unshift(entry);
+  stats.recentSearches.unshift({ product, time: new Date().toISOString() });
   if (stats.recentSearches.length > 50) stats.recentSearches.pop();
-
-  // Extract brand/category from product string
-  const words = product.toLowerCase().split(' ');
   stats.popularProducts[product] = (stats.popularProducts[product] || 0) + 1;
-
-  // Track hourly
   const hour = new Date().toISOString().slice(0, 13);
   stats.hourlySearches[hour] = (stats.hourlySearches[hour] || 0) + 1;
 }
 
-// ── Session store ─────────────────────────────────────────────
+// ── Session store (admin only) ────────────────────────────────
 const sessions = new Map();
-const SESSION_TTL_MS = 4 * 60 * 60 * 1000; // 4 hours
+const SESSION_TTL_MS = 4 * 60 * 60 * 1000;
 
 function createSession() {
   const token = crypto.randomBytes(32).toString('hex');
@@ -59,11 +53,16 @@ function isValidSession(token) {
   return true;
 }
 
+setInterval(() => {
+  const now = Date.now();
+  for (const [t, exp] of sessions) if (now > exp) sessions.delete(t);
+}, 30 * 60 * 1000);
+
 // ── Middleware ────────────────────────────────────────────────
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Rate limiter
+// Rate limiter — 60 requests/min per IP
 const rateLimits = new Map();
 function rateLimit(req, res, next) {
   const ip  = req.ip || req.connection.remoteAddress;
@@ -72,16 +71,14 @@ function rateLimit(req, res, next) {
   if (now - win.start > 60000) { win.count = 0; win.start = now; }
   win.count++;
   rateLimits.set(ip, win);
-  if (win.count > 60) return res.status(429).json({ error: 'Too many requests.' });
+  if (win.count > 60) return res.status(429).json({ error: 'Too many requests. Please wait.' });
   next();
 }
 
 // Auth middleware for admin routes
 function requireAuth(req, res, next) {
   const token = req.headers['x-admin-token'] || req.query.token;
-  if (!isValidSession(token)) {
-    return res.status(401).json({ error: 'Unauthorized. Please log in.' });
-  }
+  if (!isValidSession(token)) return res.status(401).json({ error: 'Unauthorized.' });
   next();
 }
 
@@ -89,6 +86,7 @@ function requireAuth(req, res, next) {
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
+// POST /api/login — password check for admin
 app.post('/api/login', rateLimit, async (req, res) => {
   const { password } = req.body || {};
   if (!password) return res.status(400).json({ error: 'Password required.' });
@@ -96,81 +94,156 @@ app.post('/api/login', rateLimit, async (req, res) => {
   if (!hash) return res.status(500).json({ error: 'Server misconfigured.' });
   const match = await bcrypt.compare(password, hash);
   if (!match) return res.status(401).json({ error: 'Incorrect password.' });
-  const token = createSession();
-  res.json({ token });
+  res.json({ token: createSession() });
 });
 
+// POST /api/search — PUBLIC, searches products or hotels
 app.post('/api/search', rateLimit, async (req, res) => {
   const { product } = req.body || {};
   if (!product || product.trim().length < 2)
-    return res.status(400).json({ error: 'Please provide a product name.' });
+    return res.status(400).json({ error: 'Please provide a product or hotel name.' });
 
   const GROQ_KEY = process.env.GROQ_API_KEY;
   if (!GROQ_KEY) return res.status(500).json({ error: 'API not configured.' });
 
-  const systemPrompt = 'You are a Nepal e-commerce price comparison expert. Return ONLY a valid JSON array of prices from Nepali online stores: Daraz (daraz.com.np), SastoDeal (sastodeal.com), Gyapu (gyapu.com), Electromandu (electromandu.com), Kinaun (kinaun.com), Samsung Plaza (samsungplaza.com.np), Magic Mart (magicmartnepal.com), Thulo.com, OkDam (okdam.com), FatafatSewa (fatafatsewa.com). Each object: {store, url, price (NPR int), original_price (int or null), tags (array), in_stock (bool), note (string)}. Sort by price asc. 3-7 results. NPR prices only. No markdown.';
+  const query = product.trim().toLowerCase();
+  const isHotel = query.includes('hotel') || query.includes('resort') ||
+                  query.includes('lodge') || query.includes('inn') ||
+                  query.includes('homestay');
+
+  let systemPrompt;
+
+  if (isHotel) {
+    // Hotel/Resort search prompt
+    systemPrompt = `You are a Nepal hotel and resort price comparison expert. Return ONLY a valid JSON array of hotel/resort listings from Nepal booking sites: Booking.com Nepal, Agoda Nepal, Nepaltrekking.com, Tripadvisor Nepal, direct hotel websites, and local booking platforms.
+
+Each object must have:
+{
+  "store": "platform or hotel name",
+  "url": "booking URL",
+  "price": integer price in NPR per night,
+  "original_price": integer or null if no discount,
+  "tags": ["array of tags like Free Breakfast", "Free Wifi", "Pool", "Mountain View", "Book Direct"],
+  "in_stock": true or false (availability),
+  "note": "one sentence about the property or deal"
+}
+
+Rules: NPR prices only. Sort by price ascending. 3-6 results. Include star rating in tags if known. No markdown.`;
+  } else {
+    // Product search prompt
+    systemPrompt = `You are a Nepal e-commerce price comparison expert. Return ONLY a valid JSON array of prices from Nepali online stores: Daraz (daraz.com.np), SastoDeal (sastodeal.com), Gyapu (gyapu.com), Electromandu (electromandu.com), Kinaun (kinaun.com), Samsung Plaza (samsungplaza.com.np), Magic Mart (magicmartnepal.com), Thulo.com, OkDam (okdam.com), FatafatSewa (fatafatsewa.com).
+
+Each object must have:
+{
+  "store": "store display name",
+  "url": "full product URL",
+  "price": integer NPR price,
+  "original_price": integer or null,
+  "tags": ["array", "of", "tags"],
+  "in_stock": true or false,
+  "note": "one short sentence"
+}
+
+Rules: NPR prices only. Sort by price ascending. 3-7 results. No markdown.`;
+  }
 
   try {
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile', temperature: 0.15, max_tokens: 1200,
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.15,
+        max_tokens: 1400,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: 'Find prices for: ' + product.trim() + ' in Nepal. JSON only.' }
+          { role: 'user', content: `Find ${isHotel ? 'hotel/resort prices' : 'prices'} for: ${product.trim()} in Nepal. JSON array only.` }
         ]
       })
     });
+
     const data = await groqRes.json();
     if (data.error) throw new Error(data.error.message || 'Groq error');
-    let raw = (data.choices?.[0]?.message?.content || '').replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+
+    let raw = (data.choices?.[0]?.message?.content || '')
+      .replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
     const match = raw.match(/\[[\s\S]*\]/);
     const results = JSON.parse(match ? match[0] : raw);
     trackSearch(product.trim());
-    res.json({ results });
+    res.json({ results, type: isHotel ? 'hotel' : 'product' });
+
   } catch (err) {
     stats.errors++;
     res.status(500).json({ error: err.message || 'Search failed.' });
   }
 });
 
-app.post('/api/offers', rateLimit, async (req, res) => {
+// POST /api/banner-offers — PUBLIC, fetches real deals from Daraz, Jeeva, HamroBazaar
+app.post('/api/banner-offers', rateLimit, async (req, res) => {
   const GROQ_KEY = process.env.GROQ_API_KEY;
   if (!GROQ_KEY) return res.status(500).json({ error: 'API not configured.' });
-  stats.totalOfferLoads++;
+
   try {
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile', temperature: 0.4, max_tokens: 800,
-        messages: [{ role: 'user', content: 'Generate 14 hot deals from Nepal online stores (Daraz, SastoDeal, Gyapu, Electromandu, Kinaun, Magic Mart). JSON array only. Each: {store,product,original_price,sale_price,discount_pct,tag}' }]
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.4,
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `Generate 9 realistic current promotional banner offers from these 3 specific Nepal online stores:
+- Daraz Nepal (daraz.com.np) — 3 offers
+- Jeeva (jeeva.com.np) — 3 offers  
+- HamroBazaar (hamrobazaar.com) — 3 offers
+
+Each offer should be a real-looking promotional banner deal with a discount.
+
+Respond ONLY with a valid JSON array, no markdown. Each item:
+{
+  "store": "Daraz" or "Jeeva" or "HamroBazaar",
+  "store_url": "homepage URL",
+  "title": "short catchy offer title (max 6 words)",
+  "description": "one line description of the deal",
+  "discount": "discount text e.g. Up to 40% OFF",
+  "category": "product category e.g. Electronics, Fashion, Home",
+  "color": "one of: orange, blue, green, purple, red",
+  "url": "realistic deal page URL on that store"
+}`
+        }]
       })
     });
+
     const data = await groqRes.json();
-    let raw = (data.choices?.[0]?.message?.content||'').replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+    let raw = (data.choices?.[0]?.message?.content || '')
+      .replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
     const match = raw.match(/\[[\s\S]*\]/);
-    res.json({ offers: JSON.parse(match ? match[0] : raw) });
+    const offers = JSON.parse(match ? match[0] : raw);
+    res.json({ offers });
+
   } catch(err) {
     stats.errors++;
-    res.status(500).json({ error: 'Could not load offers.' });
+    res.status(500).json({ error: 'Could not load banner offers.' });
   }
+});
+
+// POST /api/offers — kept for backward compatibility (ticker, now unused on frontend)
+app.post('/api/offers', rateLimit, async (req, res) => {
+  res.json({ offers: [] });
 });
 
 // ── ADMIN ROUTES (password protected) ────────────────────────
 
 app.get('/api/admin/stats', requireAuth, (req, res) => {
-  const uptimeMs = Date.now() - new Date(stats.serverStartTime).getTime();
+  const uptimeMs  = Date.now() - new Date(stats.serverStartTime).getTime();
   const uptimeHrs = Math.floor(uptimeMs / 3600000);
   const uptimeMins = Math.floor((uptimeMs % 3600000) / 60000);
 
-  // Top 10 searches
   const topSearches = Object.entries(stats.popularProducts)
-    .sort((a,b) => b[1] - a[1]).slice(0, 10)
+    .sort((a, b) => b[1] - a[1]).slice(0, 10)
     .map(([product, count]) => ({ product, count }));
 
-  // Last 24h hourly chart data
   const now = new Date();
   const hourlyData = [];
   for (let i = 23; i >= 0; i--) {
@@ -192,18 +265,19 @@ app.get('/api/admin/stats', requireAuth, (req, res) => {
   });
 });
 
-// Serve admin panel HTML
+// Serve admin panel
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'index.html'));
 });
 
-// Catch-all → frontend
+// Catch-all → serve frontend
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// ── Start ─────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log('\n Nepal Price Finder running at http://localhost:' + PORT);
   console.log(' Admin panel: http://localhost:' + PORT + '/admin');
-  console.log(' API key secured — never exposed to browser\n');
+  console.log(' API key secured in .env — never exposed to browser\n');
 });
