@@ -15,7 +15,6 @@
   --blue:#003893;
   --blue-light:#1a4fb5;
   --gold:#ffd700;
-  --gold-soft:#ffec6e;
   --white:#ffffff;
   --white-90:rgba(255,255,255,0.90);
   --white-70:rgba(255,255,255,0.70);
@@ -27,213 +26,61 @@
   --font:'Sora',sans-serif;
   --mono:'JetBrains Mono',monospace
 }
-
-body{
-  font-family:var(--font);
-  background:var(--red);
-  color:var(--white);
-  min-height:100vh;
-  overflow-x:hidden;
-}
-
-/* Subtle texture overlay */
-body::before{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(ellipse at 10% 0%, rgba(255,215,0,0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 90% 100%, rgba(0,56,147,0.12) 0%, transparent 50%);
-  pointer-events:none;
-  z-index:0;
-}
-
-/* ── NAV ──────────────────────────────────────── */
-nav{
-  position:relative;z-index:10;
-  background:var(--red-dark);
-  border-bottom:2px solid var(--blue);
-  padding:0 28px;
-  height:52px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-.nav-logo{
-  display:flex;align-items:center;gap:10px;
-  font-family:var(--mono);font-size:13px;font-weight:500;
-  letter-spacing:.1em;text-transform:uppercase;color:var(--white);
-}
-.nav-flag{
-  display:flex;flex-direction:column;gap:2px;
-}
+body{font-family:var(--font);background:var(--red);color:var(--white);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 10% 0%,rgba(255,215,0,0.06) 0%,transparent 50%),radial-gradient(ellipse at 90% 100%,rgba(0,56,147,0.12) 0%,transparent 50%);pointer-events:none;z-index:0}
+nav{position:relative;z-index:10;background:var(--red-dark);border-bottom:2px solid var(--blue);padding:0 28px;height:52px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--white)}
+.nav-flag{display:flex;flex-direction:column;gap:2px}
 .flag-red{width:18px;height:12px;background:var(--red-light);border-radius:2px}
 .flag-blue{width:18px;height:3px;background:var(--blue)}
 .nav-links{display:flex;align-items:center;gap:6px}
-.nav-link{
-  font-size:11px;font-family:var(--mono);
-  color:var(--white-70);padding:5px 12px;
-  border:1px solid var(--white-15);border-radius:20px;
-  text-decoration:none;transition:all .2s;cursor:pointer;background:none;
-}
+.nav-link{font-size:11px;font-family:var(--mono);color:var(--white-70);padding:5px 12px;border:1px solid var(--white-15);border-radius:20px;text-decoration:none;transition:all .2s;cursor:pointer;background:none}
 .nav-link:hover{color:var(--white);border-color:var(--white-40);background:var(--white-08)}
 .nav-link.gold{color:var(--gold);border-color:rgba(255,215,0,.3)}
-.nav-link.gold:hover{background:rgba(255,215,0,.1)}
-
-/* Blue border stripe */
 .blue-stripe{height:4px;background:var(--blue);position:relative;z-index:10}
-
-/* ── HEADER ───────────────────────────────────── */
-.header{
-  position:relative;z-index:5;
-  padding:60px 24px 48px;
-  text-align:center;
-}
-.header-badge{
-  display:inline-flex;align-items:center;gap:7px;
-  background:var(--white-08);border:1px solid var(--white-15);
-  border-radius:20px;padding:5px 16px;
-  font-family:var(--mono);font-size:11px;letter-spacing:.1em;
-  color:var(--white-70);text-transform:uppercase;margin-bottom:20px;
-}
+.header{position:relative;z-index:5;padding:60px 24px 48px;text-align:center}
+.header-badge{display:inline-flex;align-items:center;gap:7px;background:var(--white-08);border:1px solid var(--white-15);border-radius:20px;padding:5px 16px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--white-70);text-transform:uppercase;margin-bottom:20px}
 .badge-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse-dot 2s ease-in-out infinite}
 @keyframes pulse-dot{0%,100%{opacity:.5;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
-
-h1{
-  font-size:clamp(32px,6vw,58px);
-  font-weight:700;
-  letter-spacing:-.03em;
-  line-height:1.05;
-  color:var(--white);
-  margin-bottom:14px;
-  text-shadow:0 2px 20px rgba(0,0,0,0.2);
-}
+h1{font-size:clamp(32px,6vw,58px);font-weight:700;letter-spacing:-.03em;line-height:1.05;color:var(--white);margin-bottom:14px;text-shadow:0 2px 20px rgba(0,0,0,0.2)}
 h1 .gold{color:var(--gold)}
 h1 .light{color:var(--white-90);font-weight:300}
-
-.subtitle{
-  font-size:15px;font-weight:300;
-  color:var(--white-70);line-height:1.7;
-  max-width:500px;margin:0 auto;
-}
+.subtitle{font-size:15px;font-weight:300;color:var(--white-70);line-height:1.7;max-width:500px;margin:0 auto}
 .subtitle strong{color:var(--white);font-weight:500}
-
-/* ── SEARCH CARD ──────────────────────────────── */
 .search-wrap{max-width:720px;margin:36px auto 0;padding:0 20px;position:relative;z-index:5}
-.search-card{
-  background:var(--black-20);
-  border:1px solid var(--white-15);
-  border-radius:20px;
-  padding:28px;
-  backdrop-filter:blur(10px);
-  position:relative;overflow:hidden;
-}
-.search-card::before{
-  content:'';position:absolute;
-  top:-60px;right:-60px;
-  width:180px;height:180px;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,215,0,.08) 0%,transparent 70%);
-  pointer-events:none;
-}
-
+.search-card{background:var(--black-20);border:1px solid var(--white-15);border-radius:20px;padding:28px;backdrop-filter:blur(10px);position:relative;overflow:hidden}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .field{display:flex;flex-direction:column;gap:7px}
-.field label{
-  font-size:11px;font-weight:500;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--white-70);font-family:var(--mono);
-}
-.field input,.field select{
-  background:var(--black-20);
-  border:1px solid var(--white-15);
-  border-radius:10px;padding:12px 14px;
-  color:var(--white);font-family:var(--font);font-size:14px;
-  outline:none;transition:all .2s;width:100%;
-  -webkit-appearance:none;appearance:none;
-}
-.field select{
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.5)' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer;
-}
+.field label{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--white-70);font-family:var(--mono)}
+.field input,.field select{background:var(--black-20);border:1px solid var(--white-15);border-radius:10px;padding:12px 14px;color:var(--white);font-family:var(--font);font-size:14px;outline:none;transition:all .2s;width:100%;-webkit-appearance:none;appearance:none}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.5)' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer}
 .field select option{background:#7a0819;color:#fff}
-.field select optgroup{background:#7a0819;color:rgba(255,255,255,.6);font-size:11px}
-.field input:focus,.field select:focus{
-  border-color:var(--gold);
-  background:rgba(0,0,0,0.35);
-  box-shadow:0 0 0 3px rgba(255,215,0,0.12);
-}
+.field input:focus,.field select:focus{border-color:var(--gold);background:rgba(0,0,0,0.35);box-shadow:0 0 0 3px rgba(255,215,0,0.12)}
 .field input::placeholder{color:var(--white-40)}
 .full-row{grid-column:1/-1}
-
-.search-btn{
-  width:100%;margin-top:4px;
-  padding:15px;
-  background:var(--white);
-  color:var(--red-dark);
-  font-family:var(--font);font-size:15px;font-weight:700;
-  border:none;border-radius:12px;cursor:pointer;
-  transition:all .2s;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  letter-spacing:.01em;
-}
-.search-btn:hover:not(:disabled){
-  background:var(--gold);
-  color:var(--red-dark);
-  transform:translateY(-2px);
-  box-shadow:0 8px 28px rgba(0,0,0,0.25);
-}
+.search-btn{width:100%;margin-top:4px;padding:15px;background:var(--white);color:var(--red-dark);font-family:var(--font);font-size:15px;font-weight:700;border:none;border-radius:12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.search-btn:hover:not(:disabled){background:var(--gold);color:var(--red-dark);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,0.25)}
 .search-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* ── RESULTS ──────────────────────────────────── */
 .results-wrap{max-width:720px;margin:28px auto 0;padding:0 20px;position:relative;z-index:5}
 .results-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
 .results-title{font-size:11px;font-family:var(--mono);color:var(--white-40);letter-spacing:.1em;text-transform:uppercase}
 .results-count{font-size:11px;font-family:var(--mono);color:var(--gold)}
-
-/* Savings bar */
-.savings-bar{
-  background:var(--black-20);border:1px solid var(--white-15);
-  border-radius:12px;padding:16px 20px;margin-bottom:16px;
-  display:flex;gap:16px;flex-wrap:wrap;
-}
+.savings-bar{background:var(--black-20);border:1px solid var(--white-15);border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;gap:16px;flex-wrap:wrap}
 .sav-item{flex:1;min-width:90px}
 .sav-label{font-size:10px;font-family:var(--mono);color:var(--white-40);letter-spacing:.06em;text-transform:uppercase}
 .sav-val{font-size:20px;font-weight:700;margin-top:3px;font-family:var(--mono)}
-
-/* Price card */
-.price-card{
-  background:var(--black-20);
-  border:1px solid var(--white-15);
-  border-radius:12px;padding:18px 20px;
-  margin-bottom:10px;
-  display:flex;align-items:center;gap:16px;
-  cursor:pointer;
-  transition:all .2s;
-  animation:slideIn .3s ease both;
-}
-.price-card:hover{
-  border-color:var(--white-40);
-  background:var(--black-30);
-  transform:translateX(4px);
-}
-.price-card.cheapest{
-  border-color:var(--gold);
-  background:rgba(0,0,0,0.3);
-  box-shadow:0 0 20px rgba(255,215,0,0.1);
-}
-.price-card.priciest{border-color:rgba(255,255,255,.08)}
-.price-card.hotel{border-color:rgba(100,149,237,.3)}
-.price-card.hotel.cheapest{border-color:var(--gold)}
-
+.price-card{background:var(--black-20);border:1px solid var(--white-15);border-radius:12px;padding:18px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:all .2s;animation:slideIn .3s ease both}
+.price-card:hover{border-color:var(--white-40);background:var(--black-30);transform:translateX(4px)}
+.price-card.cheapest{border-color:var(--gold);background:rgba(0,0,0,0.3);box-shadow:0 0 20px rgba(255,215,0,0.1)}
 @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-
 .rank-num{font-family:var(--mono);font-size:14px;color:var(--white-40);min-width:24px;text-align:center}
 .rank-num.first{color:var(--gold);font-weight:700}
 .store-info{flex:1;min-width:0}
 .store-name{font-size:15px;font-weight:600;color:var(--white)}
 .store-url{font-size:11px;font-family:var(--mono);color:var(--white-40);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .store-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
-.tag{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;letter-spacing:.03em}
+.tag{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px}
 .tag-official{background:rgba(100,149,237,.2);color:#93b8f5;border:1px solid rgba(100,149,237,.3)}
 .tag-good{background:rgba(100,220,130,.12);color:#6dde8f;border:1px solid rgba(100,220,130,.25)}
 .tag-deal{background:rgba(255,215,0,.15);color:var(--gold);border:1px solid rgba(255,215,0,.3)}
@@ -245,10 +92,8 @@ h1 .light{color:var(--white-90);font-weight:300}
 .price-per-night{font-size:10px;font-family:var(--mono);color:var(--white-40);margin-top:1px}
 .price-orig{font-size:11px;color:var(--white-40);text-decoration:line-through;font-family:var(--mono);margin-top:1px}
 .disc-badge{font-size:10px;background:rgba(255,215,0,.18);color:var(--gold);padding:1px 7px;border-radius:4px;font-family:var(--mono);display:inline-block;margin-top:2px}
-.visit-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--gold);text-decoration:none;margin-top:5px;opacity:.8;transition:opacity .15s}
+.visit-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--gold);text-decoration:none;margin-top:5px;opacity:.8}
 .visit-link:hover{opacity:1}
-
-/* Loading */
 .loading-state{text-align:center;padding:60px 20px}
 .loading-dots{display:flex;justify-content:center;gap:7px;margin-bottom:18px}
 .loading-dots span{width:9px;height:9px;border-radius:50%;background:var(--gold);animation:ldot 1.2s ease-in-out infinite}
@@ -257,78 +102,23 @@ h1 .light{color:var(--white-90);font-weight:300}
 @keyframes ldot{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:1}}
 .loading-text{font-size:13px;color:var(--white-70);font-family:var(--mono);min-height:22px}
 .empty-state{text-align:center;padding:60px 20px;color:var(--white-40);font-size:14px;line-height:1.7}
-.notice{
-  background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);
-  border-radius:10px;padding:12px 16px;font-size:11px;color:rgba(255,215,0,.7);
-  margin-top:14px;line-height:1.6;font-family:var(--mono);
-}
-
-/* ── BANNER SECTION ────────────────────────────── */
-.banner-section{
-  max-width:720px;margin:48px auto 0;
-  padding:0 20px;position:relative;z-index:5;
-}
-.banner-header{
-  display:flex;align-items:center;
-  justify-content:space-between;
-  margin-bottom:16px;flex-wrap:wrap;gap:8px;
-}
-.banner-title{
-  font-size:11px;font-family:var(--mono);
-  color:var(--white-40);letter-spacing:.12em;text-transform:uppercase;
-  display:flex;align-items:center;gap:8px;
-}
-.banner-title::before{
-  content:'';display:inline-block;width:6px;height:6px;
-  border-radius:50%;background:var(--gold);
-}
-.banner-powered{
-  font-size:11px;font-family:var(--mono);color:var(--white-40);
-}
+.notice{background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);border-radius:10px;padding:12px 16px;font-size:11px;color:rgba(255,215,0,.7);margin-top:14px;line-height:1.6;font-family:var(--mono)}
+.banner-section{max-width:720px;margin:48px auto 0;padding:0 20px;position:relative;z-index:5}
+.banner-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.banner-title{font-size:11px;font-family:var(--mono);color:var(--white-40);letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.banner-title::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.banner-powered{font-size:11px;font-family:var(--mono);color:var(--white-40)}
 .banner-powered span{color:var(--gold);font-weight:600}
-
 .banner-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.banner-card{
-  background:var(--black-20);
-  border:1px solid var(--white-08);
-  border-radius:14px;padding:16px 14px;
-  cursor:pointer;text-decoration:none;
-  transition:all .2s;
-  min-height:120px;
-  display:flex;flex-direction:column;justify-content:space-between;
-  animation:slideIn .4s ease both;
-  position:relative;overflow:hidden;
-}
-.banner-card::before{
-  content:'';position:absolute;
-  top:-20px;right:-20px;
-  width:60px;height:60px;border-radius:50%;opacity:.15;
-}
-.banner-card:hover{
-  border-color:var(--white-40);
-  background:rgba(0,0,0,0.35);
-  transform:translateY(-3px);
-  box-shadow:0 10px 28px rgba(0,0,0,0.3);
-}
-
-/* Store colour accents */
-.bc-daraz::before{background:#f57224}
+.banner-card{background:var(--black-20);border:1px solid var(--white-08);border-radius:14px;padding:16px 14px;cursor:pointer;text-decoration:none;transition:all .2s;min-height:120px;display:flex;flex-direction:column;justify-content:space-between;animation:slideIn .4s ease both;position:relative;overflow:hidden}
+.banner-card:hover{border-color:var(--white-40);background:rgba(0,0,0,0.35);transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,0.3)}
 .bc-daraz{border-top:2px solid #f57224}
-.bc-jeeva::before{background:#4ade80}
 .bc-jeeva{border-top:2px solid #4ade80}
-.bc-hamro::before{background:#60a5fa}
 .bc-hamro{border-top:2px solid #60a5fa}
-
-.bc-store-badge{
-  font-size:9px;font-family:var(--mono);font-weight:700;
-  letter-spacing:.1em;text-transform:uppercase;
-  padding:2px 8px;border-radius:20px;
-  display:inline-block;margin-bottom:7px;width:fit-content;
-}
+.bc-store-badge{font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:7px;width:fit-content}
 .bc-daraz .bc-store-badge{background:rgba(245,114,36,.2);color:#f57224;border:1px solid rgba(245,114,36,.3)}
 .bc-jeeva .bc-store-badge{background:rgba(74,222,128,.2);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
 .bc-hamro .bc-store-badge{background:rgba(96,165,250,.2);color:#60a5fa;border:1px solid rgba(96,165,250,.3)}
-
 .bc-title{font-size:13px;font-weight:700;color:var(--white);line-height:1.3;margin-bottom:3px}
 .bc-desc{font-size:11px;color:var(--white-70);line-height:1.5;margin-bottom:7px}
 .bc-discount{font-size:13px;font-weight:700;font-family:var(--mono)}
@@ -336,59 +126,25 @@ h1 .light{color:var(--white-90);font-weight:300}
 .bc-jeeva .bc-discount{color:#4ade80}
 .bc-hamro .bc-discount{color:#60a5fa}
 .bc-arrow{font-size:11px;color:var(--white-40);margin-top:5px;display:block}
-
-/* Skeleton */
-.banner-skeleton{
-  border-radius:14px;background:var(--black-20);
-  border:1px solid var(--white-08);min-height:120px;
-  animation:shimmer 1.5s ease-in-out infinite;
-}
+.banner-skeleton{border-radius:14px;background:var(--black-20);border:1px solid var(--white-08);min-height:120px;animation:shimmer 1.5s ease-in-out infinite}
 @keyframes shimmer{0%,100%{opacity:.3}50%{opacity:.7}}
-
-/* Powered footer */
-.powered-footer{
-  text-align:center;padding:14px 20px 6px;
-  font-size:11px;font-family:var(--mono);color:var(--white-40);
-}
+.powered-footer{text-align:center;padding:14px 20px 6px;font-size:11px;font-family:var(--mono);color:var(--white-40)}
 .powered-footer a{color:var(--white-70);text-decoration:none;opacity:.8}
 .powered-footer a:hover{opacity:1;color:var(--gold)}
-
-/* ── FOOTER ────────────────────────────────────── */
-footer{
-  text-align:center;padding:28px 24px;
-  font-size:11px;color:var(--white-40);
-  font-family:var(--mono);letter-spacing:.05em;
-  border-top:1px solid var(--white-08);
-  margin-top:48px;position:relative;z-index:5;
-}
+footer{text-align:center;padding:28px 24px;font-size:11px;color:var(--white-40);font-family:var(--mono);letter-spacing:.05em;border-top:1px solid var(--white-08);margin-top:48px;position:relative;z-index:5}
 footer a{color:var(--white-70);text-decoration:none}
 footer a:hover{color:var(--gold)}
-
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-track{background:var(--red-dark)}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:3px}
-
-@media(max-width:640px){
-  .field-row{grid-template-columns:1fr}
-  .savings-bar{flex-direction:column;gap:12px}
-  .price-card{flex-wrap:wrap}
-  .banner-grid{grid-template-columns:1fr}
-  .nav-links{display:none}
-}
-@media(min-width:641px) and (max-width:900px){
-  .banner-grid{grid-template-columns:repeat(2,1fr)}
-}
+@media(max-width:640px){.field-row{grid-template-columns:1fr}.savings-bar{flex-direction:column;gap:12px}.price-card{flex-wrap:wrap}.banner-grid{grid-template-columns:1fr}}
+@media(min-width:641px) and (max-width:900px){.banner-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
-
-<!-- ── NAV ── -->
 <nav>
   <div class="nav-logo">
-    <div class="nav-flag">
-      <div class="flag-red"></div>
-      <div class="flag-blue"></div>
-    </div>
+    <div class="nav-flag"><div class="flag-red"></div><div class="flag-blue"></div></div>
     Nepal Price Finder
   </div>
   <div class="nav-links">
@@ -398,347 +154,71 @@ footer a:hover{color:var(--gold)}
   </div>
 </nav>
 <div class="blue-stripe"></div>
-
-<!-- ── HEADER ── -->
 <header class="header">
-  <div class="header-badge">
-    <span class="badge-dot"></span>
-    Live Price Comparison — Nepal
-  </div>
-  <h1>
-    Find the <span class="gold">Cheapest</span><br/>
-    <span class="light">Price Across Nepal's Web</span>
-  </h1>
-  <p class="subtitle">
-    Compare <strong>Daraz · SastoDeal · Gyapu · Electromandu</strong> and more<br/>
-    Also search <strong>hotels &amp; resorts</strong> — sorted lowest to highest
-  </p>
+  <div class="header-badge"><span class="badge-dot"></span>Live Price Comparison — Nepal</div>
+  <h1>Find the <span class="gold">Cheapest</span><br/><span class="light">Price Across Nepal's Web</span></h1>
+  <p class="subtitle">Compare <strong>Daraz · SastoDeal · Gyapu · Electromandu</strong> and more<br/>Also search <strong>hotels &amp; resorts</strong> — sorted lowest to highest</p>
 </header>
-
-<!-- ── SEARCH ── -->
 <div class="search-wrap">
   <div class="search-card">
     <div class="field-row">
-      <div class="field">
-        <label>Category</label>
+      <div class="field"><label>Category</label>
         <select id="category">
-          <option value="">— Select Category —</option>
-          <optgroup label="Electronics">
-            <option>Refrigerator</option>
-            <option>Washing Machine</option>
-            <option>Television / TV</option>
-            <option>Air Conditioner</option>
-            <option>Laptop</option>
-            <option>Smartphone / Mobile</option>
-            <option>Microwave Oven</option>
-            <option>Water Heater / Geyser</option>
-            <option>Mixer / Grinder / Blender</option>
-            <option>Headphones / Earphones</option>
-            <option>Camera</option>
-            <option>Tablet</option>
-            <option>Printer</option>
-          </optgroup>
-          <optgroup label="Travel &amp; Stay">
-            <option>Hotel</option>
-            <option>Resort</option>
-            <option>Lodge / Homestay</option>
-          </optgroup>
-          <optgroup label="Other">
-            <option>Other</option>
-          </optgroup>
+          <option value="">-- Select Category --</option>
+          <optgroup label="Electronics"><option>Refrigerator</option><option>Washing Machine</option><option>Television / TV</option><option>Air Conditioner</option><option>Laptop</option><option>Smartphone / Mobile</option><option>Microwave Oven</option><option>Water Heater / Geyser</option><option>Mixer / Grinder / Blender</option><option>Headphones / Earphones</option><option>Camera</option><option>Tablet</option><option>Printer</option></optgroup>
+          <optgroup label="Travel &amp; Stay"><option>Hotel</option><option>Resort</option><option>Lodge / Homestay</option></optgroup>
+          <optgroup label="Other"><option>Other</option></optgroup>
         </select>
       </div>
-      <div class="field">
-        <label>Brand / Location</label>
+      <div class="field"><label>Brand / Location</label>
         <select id="brand">
-          <option value="">— Any —</option>
-          <optgroup label="Electronics Brands">
-            <option>Samsung</option>
-            <option>LG</option>
-            <option>Sony</option>
-            <option>Panasonic</option>
-            <option>Whirlpool</option>
-            <option>Haier</option>
-            <option>Apple</option>
-            <option>Xiaomi / Mi</option>
-            <option>Realme</option>
-            <option>Vivo</option>
-            <option>OPPO</option>
-            <option>HP</option>
-            <option>Dell</option>
-            <option>Lenovo</option>
-            <option>Asus</option>
-            <option>CG</option>
-            <option>Himstar</option>
-          </optgroup>
-          <optgroup label="Hotel Locations">
-            <option>Kathmandu</option>
-            <option>Pokhara</option>
-            <option>Chitwan</option>
-            <option>Lumbini</option>
-            <option>Nagarkot</option>
-            <option>Bandipur</option>
-            <option>Mustang</option>
-            <option>Everest Region</option>
-            <option>Annapurna Region</option>
-          </optgroup>
+          <option value="">-- Any --</option>
+          <optgroup label="Electronics Brands"><option>Samsung</option><option>LG</option><option>Sony</option><option>Panasonic</option><option>Whirlpool</option><option>Haier</option><option>Apple</option><option>Xiaomi / Mi</option><option>Realme</option><option>Vivo</option><option>OPPO</option><option>HP</option><option>Dell</option><option>Lenovo</option><option>Asus</option><option>CG</option><option>Himstar</option></optgroup>
+          <optgroup label="Hotel Locations"><option>Kathmandu</option><option>Pokhara</option><option>Chitwan</option><option>Lumbini</option><option>Nagarkot</option><option>Bandipur</option><option>Mustang</option><option>Everest Region</option><option>Annapurna Region</option></optgroup>
         </select>
       </div>
-      <div class="field full-row">
-        <label>Model / Name — be specific for best results</label>
-        <input type="text" id="model"
-          placeholder="e.g. RR20C20C2RH 192L  ·  Galaxy S24  ·  Hyatt Regency Kathmandu  ·  Pokhara lakeside resort"/>
+      <div class="field full-row"><label>Model / Name</label>
+        <input type="text" id="model" placeholder="e.g. RR20C20C2RH 192L  ·  Galaxy S24  ·  Hyatt Regency Kathmandu"/>
       </div>
     </div>
     <button class="search-btn" id="searchBtn" onclick="doSearch()">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-      </svg>
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       Search Prices in Nepal
     </button>
   </div>
 </div>
-
-<!-- ── RESULTS ── -->
 <div class="results-wrap" id="resultsWrap" style="display:none">
-  <div class="results-header">
-    <span class="results-title" id="resultsTitle">RESULTS</span>
-    <span class="results-count" id="resultsCount"></span>
-  </div>
+  <div class="results-header"><span class="results-title" id="resultsTitle">RESULTS</span><span class="results-count" id="resultsCount"></span></div>
   <div id="resultsBody"></div>
   <div class="notice" id="notice" style="display:none"></div>
 </div>
-
-<!-- ── BANNER SECTION ── -->
 <div class="banner-section" id="bannerSection">
   <div class="banner-header">
     <div class="banner-title">Today's Offers in Nepal</div>
     <div class="banner-powered">Powered by <span>Nepalsweb</span></div>
   </div>
   <div class="banner-grid" id="bannerGrid">
-    <div class="banner-skeleton"></div>
-    <div class="banner-skeleton"></div>
-    <div class="banner-skeleton"></div>
-    <div class="banner-skeleton"></div>
-    <div class="banner-skeleton"></div>
-    <div class="banner-skeleton"></div>
+    <div class="banner-skeleton"></div><div class="banner-skeleton"></div><div class="banner-skeleton"></div>
+    <div class="banner-skeleton"></div><div class="banner-skeleton"></div><div class="banner-skeleton"></div>
   </div>
 </div>
-
-<div class="powered-footer">
-  Deals from
-  <a href="https://www.daraz.com.np" target="_blank">Daraz</a> ·
-  <a href="https://www.jeeva.com.np" target="_blank">Jeeva</a> ·
-  <a href="https://hamrobazaar.com" target="_blank">HamroBazaar</a>
-  &nbsp;—&nbsp; Powered by <a href="#">Nepalsweb</a>
-</div>
-
-<footer>
-  मूल्य खोज &nbsp;·&nbsp; Nepal Price Finder &nbsp;·&nbsp;
-  Always verify price on seller's site before purchase &nbsp;·&nbsp;
-  <a href="/admin">Admin</a>
-</footer>
-
+<div class="powered-footer">Deals from <a href="https://www.daraz.com.np" target="_blank">Daraz</a> · <a href="https://www.jeeva.com.np" target="_blank">Jeeva</a> · <a href="https://hamrobazaar.com" target="_blank">HamroBazaar</a> — Powered by <a href="#">Nepalsweb</a></div>
+<footer>मूल्य खोज &nbsp;·&nbsp; Nepal Price Finder &nbsp;·&nbsp; Always verify price on seller's site &nbsp;·&nbsp; <a href="/admin">Admin</a></footer>
 <script>
-// ── LOADING MESSAGES ──────────────────────────────────────────
-const PRODUCT_MSGS = [
-  'Searching Daraz Nepal...','Checking SastoDeal...','Scanning Gyapu...',
-  'Looking up Electromandu...','Fetching Kinaun prices...','Checking Samsung Plaza...',
-  'Scanning Magic Mart...','Sorting by price...'
-];
-const HOTEL_MSGS = [
-  'Searching Booking.com Nepal...','Checking Agoda Nepal...','Looking up local hotels...',
-  'Scanning resort listings...','Comparing nightly rates...','Finding best deals...'
-];
+const PRODUCT_MSGS=['Searching Daraz Nepal...','Checking SastoDeal...','Scanning Gyapu...','Looking up Electromandu...','Fetching Kinaun prices...','Sorting by price...'];
+const HOTEL_MSGS=['Searching Booking.com Nepal...','Checking Agoda Nepal...','Looking up local hotels...','Comparing nightly rates...'];
 let msgTimer;
-
-function isHotelSearch() {
-  const cat = document.getElementById('category').value.toLowerCase();
-  const mod = document.getElementById('model').value.toLowerCase();
-  return cat.includes('hotel') || cat.includes('resort') || cat.includes('lodge') ||
-         mod.includes('hotel') || mod.includes('resort') || mod.includes('lodge');
-}
-
-function startLoading() {
-  const msgs = isHotelSearch() ? HOTEL_MSGS : PRODUCT_MSGS;
-  document.getElementById('resultsWrap').style.display = 'block';
-  document.getElementById('resultsTitle').textContent = 'SEARCHING';
-  document.getElementById('resultsCount').textContent = '';
-  document.getElementById('notice').style.display = 'none';
-  let i = 0;
-  document.getElementById('resultsBody').innerHTML = `
-    <div class="loading-state">
-      <div class="loading-dots"><span></span><span></span><span></span></div>
-      <div class="loading-text" id="loadMsg">${msgs[0]}</div>
-    </div>`;
-  msgTimer = setInterval(() => {
-    i = (i + 1) % msgs.length;
-    const el = document.getElementById('loadMsg');
-    if (el) el.textContent = msgs[i];
-  }, 900);
-}
-function stopLoading() { clearInterval(msgTimer); }
-
-// ── SEARCH ────────────────────────────────────────────────────
-async function doSearch() {
-  const category = document.getElementById('category').value;
-  const brand    = document.getElementById('brand').value;
-  const model    = document.getElementById('model').value.trim();
-  if (!category && !brand && !model) {
-    alert('Please select a category, location, or enter a name.'); return;
-  }
-  const btn = document.getElementById('searchBtn');
-  btn.disabled = true;
-  btn.innerHTML = `<span style="width:16px;height:16px;border:2px solid var(--red-dark);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span>&nbsp;Searching...`;
-  startLoading();
-  const product = [brand, category, model].filter(Boolean).join(' ');
-  try {
-    const res  = await fetch('/api/search', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ product })
-    });
-    const data = await res.json();
-    stopLoading();
-    if (!res.ok) throw new Error(data.error || 'Search failed');
-    renderResults(data.results || [], product, data.type === 'hotel');
-  } catch(err) {
-    stopLoading();
-    document.getElementById('resultsBody').innerHTML = `
-      <div class="empty-state">
-        <div style="font-size:36px;margin-bottom:12px">⚠️</div>
-        <div style="color:#f87171;font-weight:600;margin-bottom:8px">Search failed</div>
-        <div style="font-size:13px;font-family:var(--mono);color:var(--white-70)">${err.message}</div>
-      </div>`;
-  }
-  btn.disabled = false;
-  btn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Search Prices in Nepal`;
-}
-
-// ── RENDER RESULTS ────────────────────────────────────────────
-function renderResults(results, query, isHotel) {
-  const body = document.getElementById('resultsBody');
-  if (!Array.isArray(results) || results.length === 0) {
-    body.innerHTML = `<div class="empty-state">
-      <div style="font-size:36px;margin-bottom:12px">🔍</div>
-      <div>No results found.<br/>Try a more specific name or model.</div>
-    </div>`;
-    return;
-  }
-  results.sort((a, b) => (Number(a.price)||0) - (Number(b.price)||0));
-  const prices  = results.map(r => Number(r.price)).filter(p => p > 0);
-  const minP    = Math.min(...prices);
-  const maxP    = Math.max(...prices);
-  const savings = maxP - minP;
-  document.getElementById('resultsTitle').textContent = isHotel ? 'HOTELS FOR' : 'RESULTS FOR';
-  document.getElementById('resultsCount').textContent = `${results.length} ${isHotel?'OPTIONS':'STORES'} · ${query.toUpperCase()}`;
-  let html = '';
-  if (results.length > 1 && savings > 0) {
-    html += `<div class="savings-bar">
-      <div class="sav-item"><div class="sav-label">${isHotel?'Best price/night':'Cheapest'}</div><div class="sav-val" style="color:var(--gold)">Rs.${minP.toLocaleString()}</div></div>
-      <div class="sav-item"><div class="sav-label">Most expensive</div><div class="sav-val" style="color:#f87171">Rs.${maxP.toLocaleString()}</div></div>
-      <div class="sav-item"><div class="sav-label">You save up to</div><div class="sav-val" style="color:#6dde8f">Rs.${savings.toLocaleString()}</div></div>
-      <div class="sav-item"><div class="sav-label">${isHotel?'Options':'Stores'} found</div><div class="sav-val" style="color:var(--white-70)">${results.length}</div></div>
-    </div>`;
-  }
-  results.forEach((r, i) => {
-    const price   = Number(r.price) || 0;
-    const origP   = Number(r.original_price) || 0;
-    const cheap   = price === minP;
-    const pricey  = price === maxP && results.length > 1;
-    const hasD    = origP > price;
-    const discPct = hasD ? Math.round((1 - price/origP)*100) : 0;
-    const tagHtml = (r.tags||[]).map(t => {
-      const tl = t.toLowerCase();
-      if (tl.includes('official')||tl.includes('authorized')||tl.includes('star'))
-        return `<span class="tag tag-official">${t}</span>`;
-      if (tl.includes('cod')||tl.includes('delivery')||tl.includes('breakfast')||tl.includes('wifi')||tl.includes('pool')||tl.includes('free'))
-        return `<span class="tag tag-good">${t}</span>`;
-      if (tl.includes('discount')||tl.includes('sale')||tl.includes('deal')||tl.includes('off'))
-        return `<span class="tag tag-deal">${t}</span>`;
-      return `<span class="tag tag-neutral">${t}</span>`;
-    }).join('');
-    const cheapTag = cheap ? `<span class="tag tag-deal">★ ${isHotel?'Best Price':'Cheapest'}</span>` : '';
-    const rankIcon = ['①','②','③','④','⑤','⑥','⑦'][i] || (i+1)+'';
-    const cardCls  = `price-card${isHotel?' hotel':''}${cheap?' cheapest':pricey?' priciest':''}`;
-    let safeUrl    = (r.url||'').startsWith('http') ? r.url : (r.url ? 'https://'+r.url : '#');
-    let hostname   = ''; try { hostname = new URL(safeUrl).hostname; } catch(e) {}
-    html += `<div class="${cardCls}" style="animation-delay:${i*.05}s" onclick="window.open('${safeUrl}','_blank')">
-      <div class="rank-num ${i===0?'first':''}">${rankIcon}</div>
-      <div class="store-info">
-        <div class="store-name">${r.store||'Store'}</div>
-        <div class="store-url">${hostname}</div>
-        <div class="store-tags">${tagHtml}${cheapTag}</div>
-        ${r.note ? `<div class="store-note">${r.note}</div>` : ''}
-      </div>
-      <div class="price-section">
-        <div class="price-val ${cheap?'best':''}">Rs.${price.toLocaleString()}</div>
-        ${isHotel ? `<div class="price-per-night">per night</div>` : ''}
-        ${hasD ? `<div class="price-orig">Rs.${origP.toLocaleString()}</div><div class="disc-badge">-${discPct}%</div>` : ''}
-        <a class="visit-link" href="${safeUrl}" target="_blank" onclick="event.stopPropagation()">${isHotel?'Book now →':'Visit store →'}</a>
-      </div>
-    </div>`;
-  });
-  body.innerHTML = html;
-  const notice = document.getElementById('notice');
-  notice.style.display = 'block';
-  notice.textContent = isHotel
-    ? '⚠ Hotel prices are estimates and vary by date/season. Always verify on the booking platform before confirming.'
-    : '⚠ Prices are based on AI knowledge. Always verify on the seller\'s website before purchasing.';
-}
-
-// ── BANNER OFFERS ─────────────────────────────────────────────
-async function loadBannerOffers() {
-  try {
-    const res  = await fetch('/api/banner-offers', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }
-    });
-    const data = await res.json();
-    renderBanners(data.offers && data.offers.length ? data.offers : getFallbackBanners());
-  } catch(e) {
-    renderBanners(getFallbackBanners());
-  }
-}
-
-function renderBanners(offers) {
-  const storeClass = { 'Daraz':'bc-daraz','Jeeva':'bc-jeeva','HamroBazaar':'bc-hamro','hamrobazaar':'bc-hamro' };
-  document.getElementById('bannerGrid').innerHTML = offers.map((o, i) => {
-    const sc  = storeClass[o.store] || storeClass[o.store?.toLowerCase()] || 'bc-daraz';
-    const url = o.url || o.store_url || '#';
-    return `<a class="banner-card ${sc}" href="${url}" target="_blank" style="animation-delay:${i*.07}s">
-      <div>
-        <div class="bc-store-badge">${o.store}</div>
-        <div class="bc-title">${o.title}</div>
-        <div class="bc-desc">${o.description}</div>
-      </div>
-      <div>
-        <div class="bc-discount">${o.discount}</div>
-        <span class="bc-arrow">Shop now →</span>
-      </div>
-    </a>`;
-  }).join('');
-}
-
-function getFallbackBanners() {
-  return [
-    { store:'Daraz', title:'Flash Sale Electronics', description:'Top brands at lowest prices today', discount:'Up to 50% OFF', url:'https://www.daraz.com.np/campaigns/electronics-sale/' },
-    { store:'Daraz', title:'Fashion Week Nepal', description:'Clothes, shoes & accessories', discount:'Up to 60% OFF', url:'https://www.daraz.com.np/campaigns/fashion/' },
-    { store:'Daraz', title:'Mobile Phone Deals', description:'Latest smartphones on sale now', discount:'Up to 35% OFF', url:'https://www.daraz.com.np/mobiles/' },
-    { store:'Jeeva', title:'Fresh Grocery Offers', description:'Daily essentials delivered fast', discount:'Up to 25% OFF', url:'https://www.jeeva.com.np' },
-    { store:'Jeeva', title:'Organic Products', description:'Healthy Nepali food at great prices', discount:'Up to 20% OFF', url:'https://www.jeeva.com.np' },
-    { store:'HamroBazaar', title:'Used Electronics', description:'Quality second-hand gadgets Nepal', discount:'Best Prices', url:'https://hamrobazaar.com/c-Electronics' },
-    { store:'HamroBazaar', title:'Vehicles For Sale', description:'Cars, bikes & scooters listed', discount:'Negotiate Price', url:'https://hamrobazaar.com/c-Vehicles' },
-    { store:'HamroBazaar', title:'Property Listings', description:'Buy, sell or rent in Nepal', discount:'Direct from Owner', url:'https://hamrobazaar.com/c-RealEstate' },
-    { store:'Daraz', title:'Home & Kitchen Deals', description:'Upgrade your living space today', discount:'Up to 40% OFF', url:'https://www.daraz.com.np/home-and-living/' },
-  ];
-}
-
-function scrollToBanner() {
-  document.getElementById('bannerSection').scrollIntoView({ behavior:'smooth' });
-}
-
-document.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
-window.addEventListener('load', loadBannerOffers);
+function isHotelSearch(){const c=document.getElementById('category').value.toLowerCase(),m=document.getElementById('model').value.toLowerCase();return c.includes('hotel')||c.includes('resort')||c.includes('lodge')||m.includes('hotel')||m.includes('resort');}
+function startLoading(){const msgs=isHotelSearch()?HOTEL_MSGS:PRODUCT_MSGS;document.getElementById('resultsWrap').style.display='block';document.getElementById('resultsTitle').textContent='SEARCHING';document.getElementById('resultsCount').textContent='';document.getElementById('notice').style.display='none';let i=0;document.getElementById('resultsBody').innerHTML='<div class="loading-state"><div class="loading-dots"><span></span><span></span><span></span></div><div class="loading-text" id="loadMsg">'+msgs[0]+'</div></div>';msgTimer=setInterval(()=>{i=(i+1)%msgs.length;const el=document.getElementById('loadMsg');if(el)el.textContent=msgs[i];},900);}
+function stopLoading(){clearInterval(msgTimer);}
+async function doSearch(){const category=document.getElementById('category').value,brand=document.getElementById('brand').value,model=document.getElementById('model').value.trim();if(!category&&!brand&&!model){alert('Please select a category or enter a name.');return;}const btn=document.getElementById('searchBtn');btn.disabled=true;btn.innerHTML='<span style="width:16px;height:16px;border:2px solid var(--red-dark);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span>&nbsp;Searching...';startLoading();const product=[brand,category,model].filter(Boolean).join(' ');try{const res=await fetch('/api/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product})});const data=await res.json();stopLoading();if(!res.ok)throw new Error(data.error||'Search failed');renderResults(data.results||[],product,data.type==='hotel');}catch(err){stopLoading();document.getElementById('resultsBody').innerHTML='<div class="empty-state"><div style="font-size:36px;margin-bottom:12px">⚠️</div><div style="color:#f87171;font-weight:600;margin-bottom:8px">Search failed</div><div style="font-size:13px;font-family:var(--mono);color:var(--white-70)">'+err.message+'</div></div>';}btn.disabled=false;btn.innerHTML='<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Search Prices in Nepal';}
+function renderResults(results,query,isHotel){const body=document.getElementById('resultsBody');if(!Array.isArray(results)||results.length===0){body.innerHTML='<div class="empty-state"><div style="font-size:36px;margin-bottom:12px">🔍</div><div>No results found. Try a more specific name.</div></div>';return;}results.sort((a,b)=>(Number(a.price)||0)-(Number(b.price)||0));const prices=results.map(r=>Number(r.price)).filter(p=>p>0),minP=Math.min(...prices),maxP=Math.max(...prices),savings=maxP-minP;document.getElementById('resultsTitle').textContent=isHotel?'HOTELS FOR':'RESULTS FOR';document.getElementById('resultsCount').textContent=results.length+(isHotel?' OPTIONS':' STORES')+' · '+query.toUpperCase();let html='';if(results.length>1&&savings>0)html+='<div class="savings-bar"><div class="sav-item"><div class="sav-label">'+(isHotel?'Best price/night':'Cheapest')+'</div><div class="sav-val" style="color:var(--gold)">Rs.'+minP.toLocaleString()+'</div></div><div class="sav-item"><div class="sav-label">Most expensive</div><div class="sav-val" style="color:#f87171">Rs.'+maxP.toLocaleString()+'</div></div><div class="sav-item"><div class="sav-label">You save up to</div><div class="sav-val" style="color:#6dde8f">Rs.'+savings.toLocaleString()+'</div></div><div class="sav-item"><div class="sav-label">'+(isHotel?'Options':'Stores')+' found</div><div class="sav-val" style="color:var(--white-70)">'+results.length+'</div></div></div>';results.forEach((r,i)=>{const price=Number(r.price)||0,origP=Number(r.original_price)||0,cheap=price===minP,hasD=origP>price,discPct=hasD?Math.round((1-price/origP)*100):0;const tagHtml=(r.tags||[]).map(t=>{const tl=t.toLowerCase();if(tl.includes('official')||tl.includes('star'))return '<span class="tag tag-official">'+t+'</span>';if(tl.includes('cod')||tl.includes('breakfast')||tl.includes('wifi')||tl.includes('free'))return '<span class="tag tag-good">'+t+'</span>';if(tl.includes('discount')||tl.includes('sale'))return '<span class="tag tag-deal">'+t+'</span>';return '<span class="tag tag-neutral">'+t+'</span>';}).join('')+(cheap?'<span class="tag tag-deal">★ '+(isHotel?'Best Price':'Cheapest')+'</span>':'');const rankIcon=['①','②','③','④','⑤','⑥','⑦'][i]||(i+1)+'';let safeUrl=(r.url||'').startsWith('http')?r.url:(r.url?'https://'+r.url:'#');let hostname='';try{hostname=new URL(safeUrl).hostname;}catch(e){}html+='<div class="price-card'+(isHotel?' hotel':'')+(cheap?' cheapest':'')+' " style="animation-delay:'+i*.05+'s" onclick="window.open(''+safeUrl+'','_blank')"><div class="rank-num '+(i===0?'first':'')+'">'+rankIcon+'</div><div class="store-info"><div class="store-name">'+(r.store||'Store')+'</div><div class="store-url">'+hostname+'</div><div class="store-tags">'+tagHtml+'</div>'+(r.note?'<div class="store-note">'+r.note+'</div>':'')+'</div><div class="price-section"><div class="price-val '+(cheap?'best':'')+'">Rs.'+price.toLocaleString()+'</div>'+(isHotel?'<div class="price-per-night">per night</div>':'')+(hasD?'<div class="price-orig">Rs.'+origP.toLocaleString()+'</div><div class="disc-badge">-'+discPct+'%</div>':'')+'<a class="visit-link" href="'+safeUrl+'" target="_blank" onclick="event.stopPropagation()">'+(isHotel?'Book now →':'Visit store →')+'</a></div></div>';});body.innerHTML=html;const notice=document.getElementById('notice');notice.style.display='block';notice.textContent=isHotel?'⚠ Hotel prices are estimates. Always verify on the booking platform.':'⚠ Prices are based on AI knowledge. Always verify on the seller website.';}
+async function loadBannerOffers(){try{const res=await fetch('/api/banner-offers',{method:'POST',headers:{'Content-Type':'application/json'}});const data=await res.json();renderBanners(data.offers&&data.offers.length?data.offers:getFallbackBanners());}catch(e){renderBanners(getFallbackBanners());}}
+function renderBanners(offers){const sc={Daraz:'bc-daraz',Jeeva:'bc-jeeva',HamroBazaar:'bc-hamro'};document.getElementById('bannerGrid').innerHTML=offers.map((o,i)=>'<a class="banner-card '+(sc[o.store]||'bc-daraz')+'" href="'+(o.url||'#')+'" target="_blank" style="animation-delay:'+i*.07+'s"><div><div class="bc-store-badge">'+o.store+'</div><div class="bc-title">'+o.title+'</div><div class="bc-desc">'+o.description+'</div></div><div><div class="bc-discount">'+o.discount+'</div><span class="bc-arrow">Shop now →</span></div></a>').join('');}
+function getFallbackBanners(){return[{store:'Daraz',title:'Flash Sale Electronics',description:'Top brands at lowest prices',discount:'Up to 50% OFF',url:'https://www.daraz.com.np'},{store:'Daraz',title:'Fashion Week Nepal',description:'Clothes, shoes & accessories',discount:'Up to 60% OFF',url:'https://www.daraz.com.np'},{store:'Daraz',title:'Mobile Phone Deals',description:'Latest smartphones on sale',discount:'Up to 35% OFF',url:'https://www.daraz.com.np'},{store:'Jeeva',title:'Fresh Grocery Offers',description:'Daily essentials delivered fast',discount:'Up to 25% OFF',url:'https://www.jeeva.com.np'},{store:'Jeeva',title:'Organic Products',description:'Healthy food at great prices',discount:'Up to 20% OFF',url:'https://www.jeeva.com.np'},{store:'HamroBazaar',title:'Used Electronics',description:'Quality second-hand gadgets',discount:'Best Prices',url:'https://hamrobazaar.com'},{store:'HamroBazaar',title:'Vehicles For Sale',description:'Cars, bikes & scooters',discount:'Negotiate Price',url:'https://hamrobazaar.com'},{store:'HamroBazaar',title:'Property Listings',description:'Buy, sell or rent in Nepal',discount:'Direct from Owner',url:'https://hamrobazaar.com'},{store:'Daraz',title:'Home & Kitchen',description:'Upgrade your living space',discount:'Up to 40% OFF',url:'https://www.daraz.com.np'}];}
+function scrollToBanner(){document.getElementById('bannerSection').scrollIntoView({behavior:'smooth'});}
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+window.addEventListener('load',loadBannerOffers);
 </script>
 </body>
 </html>
