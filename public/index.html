@@ -1,283 +1,521 @@
-/**
- * Nepal Price Finder — Secure Backend
- * - Groq API key stored only here, never sent to browser
- * - /api/search and /api/offers are PUBLIC (no auth needed)
- * - /api/banner-offers fetches deals from Daraz, Jeeva, HamroBazaar
- * - /admin requires password (sabina#7)
- */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>मूल्य खोज — Nepal Price Finder</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0c0f;--bg2:#111418;--bg3:#181c22;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);
+  --text:#f0ede8;--text2:#9a9590;--text3:#5a5652;
+  --accent:#e8c547;--green:#4ade80;--red:#f87171;--blue:#60a5fa;
+  --radius:12px;--font:'Sora',sans-serif;--mono:'JetBrains Mono',monospace
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 
-require('dotenv').config();
-const express = require('express');
-const bcrypt  = require('bcrypt');
-const crypto  = require('crypto');
-const path    = require('path');
+/* ── HEADER ─────────────────────────────────────── */
+.header{padding:52px 24px 36px;text-align:center;position:relative}
+.header::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.logo-tag{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--accent);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:10px}
+.logo-tag::before,.logo-tag::after{content:'';width:40px;height:1px;background:var(--accent);opacity:.35}
+h1{font-size:clamp(28px,5vw,50px);font-weight:700;letter-spacing:-.03em;line-height:1.1;margin-bottom:12px}
+h1 span{color:var(--accent)}
+.subtitle{color:var(--text2);font-size:14px;font-weight:300;line-height:1.6}
 
-const app  = express();
-const PORT = process.env.PORT || 3000;
+/* ── SEARCH ─────────────────────────────────────── */
+.search-wrap{max-width:760px;margin:40px auto 0;padding:0 20px}
+.search-card{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:28px;position:relative;overflow:hidden}
+.search-card::before{content:'';position:absolute;top:-100px;right:-100px;width:260px;height:260px;background:radial-gradient(circle,rgba(232,197,71,0.05) 0%,transparent 70%);pointer-events:none}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field label{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);font-family:var(--mono)}
+.field input,.field select{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:border-color .2s;width:100%;-webkit-appearance:none;appearance:none}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%235a5652' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer}
+.field input:focus,.field select:focus{border-color:var(--accent);background:#1a1e26}
+.field input::placeholder{color:var(--text3)}
+.full-row{grid-column:1/-1}
+.search-btn{width:100%;margin-top:4px;padding:15px;background:var(--accent);color:#0a0c0f;font-family:var(--font);font-size:15px;font-weight:600;border:none;border-radius:12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.search-btn:hover:not(:disabled){background:#f0d060;transform:translateY(-1px);box-shadow:0 8px 24px rgba(232,197,71,0.2)}
+.search-btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
 
-// ── In-memory stats tracker ───────────────────────────────────
-const stats = {
-  totalSearches:  0,
-  totalOfferLoads: 0,
-  serverStartTime: new Date(),
-  recentSearches:  [],
-  popularProducts: {},
-  hourlySearches:  {},
-  errors: 0,
+/* ── RESULTS ─────────────────────────────────────── */
+.results-wrap{max-width:760px;margin:32px auto 0;padding:0 20px}
+.results-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.results-title{font-size:11px;font-family:var(--mono);color:var(--text3);letter-spacing:.1em;text-transform:uppercase}
+.results-count{font-size:11px;font-family:var(--mono);color:var(--accent)}
+.savings-bar{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:18px;display:flex;gap:16px;flex-wrap:wrap}
+.sav-item{flex:1;min-width:100px}
+.sav-label{font-size:10px;font-family:var(--mono);color:var(--text3);letter-spacing:.06em;text-transform:uppercase}
+.sav-val{font-size:20px;font-weight:700;margin-top:3px;font-family:var(--mono)}
+
+/* Price card */
+.price-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:border-color .2s,transform .15s;animation:slideIn .3s ease both}
+.price-card:hover{border-color:var(--border2);transform:translateX(3px)}
+.price-card.cheapest{border-color:rgba(74,222,128,.4);background:linear-gradient(135deg,var(--bg2),rgba(74,222,128,.04))}
+.price-card.priciest{border-color:rgba(248,113,113,.2)}
+
+/* Hotel card — slightly different style */
+.price-card.hotel{border-color:rgba(96,165,250,.2);background:linear-gradient(135deg,var(--bg2),rgba(96,165,250,.03))}
+.price-card.hotel.cheapest{border-color:rgba(74,222,128,.4)}
+
+@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rank-num{font-family:var(--mono);font-size:13px;color:var(--text3);min-width:22px;text-align:center}
+.rank-num.first{color:var(--accent);font-weight:700}
+.store-info{flex:1;min-width:0}
+.store-name{font-size:15px;font-weight:600;color:var(--text)}
+.store-url{font-size:11px;font-family:var(--mono);color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.store-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.tag{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;letter-spacing:.03em}
+.tag-official{background:rgba(96,165,250,.15);color:var(--blue);border:1px solid rgba(96,165,250,.2)}
+.tag-cod{background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.2)}
+.tag-deal{background:rgba(232,197,71,.12);color:var(--accent);border:1px solid rgba(232,197,71,.2)}
+.tag-neutral{background:rgba(255,255,255,.05);color:var(--text3);border:1px solid var(--border)}
+.store-note{font-size:12px;color:var(--text3);margin-top:5px;line-height:1.5}
+.price-section{text-align:right;flex-shrink:0}
+.price-val{font-size:20px;font-weight:700;font-family:var(--mono);color:var(--text)}
+.price-val.green{color:var(--green)}
+.price-per-night{font-size:10px;font-family:var(--mono);color:var(--text3);margin-top:1px}
+.price-orig{font-size:11px;color:var(--text3);text-decoration:line-through;font-family:var(--mono);margin-top:1px}
+.disc-badge{font-size:10px;background:rgba(232,197,71,.15);color:var(--accent);padding:1px 6px;border-radius:4px;font-family:var(--mono);display:inline-block;margin-top:2px}
+.visit-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--accent);text-decoration:none;margin-top:5px;opacity:.8}
+.visit-link:hover{opacity:1}
+
+/* Loading */
+.loading-state{text-align:center;padding:60px 20px}
+.loading-dots{display:flex;justify-content:center;gap:6px;margin-bottom:16px}
+.loading-dots span{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.2s ease-in-out infinite}
+.loading-dots span:nth-child(2){animation-delay:.2s}
+.loading-dots span:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+.loading-text{font-size:13px;color:var(--text2);font-family:var(--mono);min-height:22px}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3);font-size:14px;line-height:1.7}
+.notice{background:rgba(232,197,71,.06);border:1px solid rgba(232,197,71,.15);border-radius:10px;padding:12px 16px;font-size:11px;color:rgba(232,197,71,.7);margin-top:14px;line-height:1.6;font-family:var(--mono)}
+
+/* ── BANNER SECTION ──────────────────────────────── */
+.banner-section{max-width:760px;margin:48px auto 0;padding:0 20px}
+.banner-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.banner-title{font-size:11px;font-family:var(--mono);color:var(--text3);letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.banner-title::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.banner-powered{font-size:11px;font-family:var(--mono);color:var(--text3)}
+.banner-powered span{color:var(--accent);font-weight:600}
+.banner-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+
+/* Individual banner card */
+.banner-card{border-radius:14px;padding:18px 16px;cursor:pointer;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;min-height:130px;display:flex;flex-direction:column;justify-content:space-between;text-decoration:none;animation:slideIn .4s ease both}
+.banner-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.4)}
+.banner-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;opacity:.15}
+
+/* Color themes */
+.bc-orange{background:linear-gradient(135deg,#1a0f00,#2a1800);border:1px solid rgba(251,146,60,.25)}
+.bc-orange::before{background:#fb923c}
+.bc-blue{background:linear-gradient(135deg,#00091a,#001529);border:1px solid rgba(96,165,250,.25)}
+.bc-blue::before{background:#60a5fa}
+.bc-green{background:linear-gradient(135deg,#001a09,#002912);border:1px solid rgba(74,222,128,.25)}
+.bc-green::before{background:#4ade80}
+.bc-purple{background:linear-gradient(135deg,#0d001a,#160029);border:1px solid rgba(167,139,250,.25)}
+.bc-purple::before{background:#a78bfa}
+.bc-red{background:linear-gradient(135deg,#1a0000,#290000);border:1px solid rgba(248,113,113,.25)}
+.bc-red::before{background:#f87171}
+
+.bc-store-badge{font-size:10px;font-family:var(--mono);font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:20px;display:inline-block;margin-bottom:8px;width:fit-content}
+.bc-orange .bc-store-badge{background:rgba(251,146,60,.2);color:#fb923c;border:1px solid rgba(251,146,60,.3)}
+.bc-blue .bc-store-badge{background:rgba(96,165,250,.2);color:#60a5fa;border:1px solid rgba(96,165,250,.3)}
+.bc-green .bc-store-badge{background:rgba(74,222,128,.2);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+.bc-purple .bc-store-badge{background:rgba(167,139,250,.2);color:#a78bfa;border:1px solid rgba(167,139,250,.3)}
+.bc-red .bc-store-badge{background:rgba(248,113,113,.2);color:#f87171;border:1px solid rgba(248,113,113,.3)}
+
+.bc-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:4px}
+.bc-desc{font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:8px}
+.bc-discount{font-size:13px;font-weight:700;font-family:var(--mono)}
+.bc-orange .bc-discount{color:#fb923c}
+.bc-blue .bc-discount{color:#60a5fa}
+.bc-green .bc-discount{color:#4ade80}
+.bc-purple .bc-discount{color:#a78bfa}
+.bc-red .bc-discount{color:#f87171}
+.bc-arrow{font-size:11px;color:var(--text3);margin-top:6px;display:block}
+
+/* Banner loading skeleton */
+.banner-skeleton{border-radius:14px;background:var(--bg2);border:1px solid var(--border);min-height:130px;animation:shimmer 1.5s ease-in-out infinite}
+@keyframes shimmer{0%,100%{opacity:.4}50%{opacity:.8}}
+
+/* Nepalsweb footer attribution */
+.powered-footer{text-align:center;padding:12px 20px 4px;font-size:11px;font-family:var(--mono);color:var(--text3)}
+.powered-footer a{color:var(--accent);text-decoration:none;opacity:.8}
+.powered-footer a:hover{opacity:1}
+
+footer{text-align:center;padding:28px 24px;font-size:11px;color:var(--text3);font-family:var(--mono);letter-spacing:.05em;border-top:1px solid var(--border);margin-top:40px}
+
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:3px}
+
+@media(max-width:640px){
+  .field-row{grid-template-columns:1fr}
+  .savings-bar{flex-direction:column;gap:12px}
+  .price-card{flex-wrap:wrap}
+  .banner-grid{grid-template-columns:1fr}
+}
+@media(min-width:641px) and (max-width:900px){
+  .banner-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="header">
+  <div class="logo-tag">Nepal Price Finder</div>
+  <h1>Find the <span>Cheapest</span> Price<br/>Across Nepal's Web</h1>
+  <p class="subtitle">Compare prices from Daraz, SastoDeal, Gyapu, Electromandu & more<br/>Also search hotels &amp; resorts — sorted lowest to highest</p>
+</header>
+
+<!-- ── SEARCH ── -->
+<div class="search-wrap">
+  <div class="search-card">
+    <div class="field-row">
+      <div class="field">
+        <label>Category</label>
+        <select id="category">
+          <option value="">— Select Category —</option>
+          <optgroup label="Electronics">
+            <option>Refrigerator</option>
+            <option>Washing Machine</option>
+            <option>Television / TV</option>
+            <option>Air Conditioner</option>
+            <option>Laptop</option>
+            <option>Smartphone / Mobile</option>
+            <option>Microwave Oven</option>
+            <option>Water Heater / Geyser</option>
+            <option>Mixer / Grinder / Blender</option>
+            <option>Headphones / Earphones</option>
+            <option>Camera</option>
+            <option>Tablet</option>
+            <option>Printer</option>
+          </optgroup>
+          <optgroup label="Travel &amp; Stay">
+            <option>Hotel</option>
+            <option>Resort</option>
+            <option>Lodge / Homestay</option>
+          </optgroup>
+          <optgroup label="Other">
+            <option>Other</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="field">
+        <label>Brand / Location</label>
+        <select id="brand">
+          <option value="">— Any —</option>
+          <!-- Electronics brands -->
+          <optgroup label="Electronics Brands">
+            <option>Samsung</option>
+            <option>LG</option>
+            <option>Sony</option>
+            <option>Panasonic</option>
+            <option>Whirlpool</option>
+            <option>Haier</option>
+            <option>Apple</option>
+            <option>Xiaomi / Mi</option>
+            <option>Realme</option>
+            <option>Vivo</option>
+            <option>OPPO</option>
+            <option>HP</option>
+            <option>Dell</option>
+            <option>Lenovo</option>
+            <option>Asus</option>
+            <option>CG</option>
+            <option>Himstar</option>
+          </optgroup>
+          <!-- Hotel locations -->
+          <optgroup label="Hotel Locations">
+            <option>Kathmandu</option>
+            <option>Pokhara</option>
+            <option>Chitwan</option>
+            <option>Lumbini</option>
+            <option>Nagarkot</option>
+            <option>Bandipur</option>
+            <option>Mustang</option>
+            <option>Everest Region</option>
+            <option>Annapurna Region</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="field full-row">
+        <label>Model / Name — be specific for best results</label>
+        <input type="text" id="model" placeholder="e.g. RR20C20C2RH 192L  ·  Galaxy S24 256GB  ·  Hyatt Regency Kathmandu  ·  Pokhara lakeside resort"/>
+      </div>
+    </div>
+    <button class="search-btn" id="searchBtn" onclick="doSearch()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Search Prices in Nepal
+    </button>
+  </div>
+</div>
+
+<!-- ── RESULTS ── -->
+<div class="results-wrap" id="resultsWrap" style="display:none">
+  <div class="results-header">
+    <span class="results-title" id="resultsTitle">RESULTS</span>
+    <span class="results-count" id="resultsCount"></span>
+  </div>
+  <div id="resultsBody"></div>
+  <div class="notice" id="notice" style="display:none"></div>
+</div>
+
+<!-- ── BANNER SECTION ── -->
+<div class="banner-section" id="bannerSection">
+  <div class="banner-header">
+    <div class="banner-title">Today's Offers in Nepal</div>
+    <div class="banner-powered">Powered by <span>Nepalsweb</span></div>
+  </div>
+  <div class="banner-grid" id="bannerGrid">
+    <!-- Skeletons while loading -->
+    <div class="banner-skeleton"></div>
+    <div class="banner-skeleton"></div>
+    <div class="banner-skeleton"></div>
+    <div class="banner-skeleton"></div>
+    <div class="banner-skeleton"></div>
+    <div class="banner-skeleton"></div>
+  </div>
+</div>
+
+<div class="powered-footer">
+  Deals sourced via <a href="https://www.daraz.com.np" target="_blank">Daraz</a>,
+  <a href="https://www.jeeva.com.np" target="_blank">Jeeva</a> &amp;
+  <a href="https://hamrobazaar.com" target="_blank">HamroBazaar</a>
+  &nbsp;·&nbsp; Powered by <a href="#" target="_blank">Nepalsweb</a>
+</div>
+
+<footer>मूल्य खोज &nbsp;·&nbsp; Always verify price on seller's site before purchase</footer>
+
+<script>
+// ── LOADING MESSAGES ──────────────────────────────────────────
+const PRODUCT_MSGS = [
+  'Searching Daraz Nepal...','Checking SastoDeal...','Scanning Gyapu...',
+  'Looking up Electromandu...','Fetching Kinaun prices...','Checking Samsung Plaza...',
+  'Scanning Magic Mart...','Checking Thulo.com...','Sorting by price...'
+];
+const HOTEL_MSGS = [
+  'Searching Booking.com Nepal...','Checking Agoda Nepal...','Looking up local hotels...',
+  'Scanning resort listings...','Comparing nightly rates...','Finding best deals...'
+];
+let msgTimer;
+
+function isHotelSearch() {
+  const cat = document.getElementById('category').value.toLowerCase();
+  const model = document.getElementById('model').value.toLowerCase();
+  return cat.includes('hotel') || cat.includes('resort') || cat.includes('lodge') ||
+         model.includes('hotel') || model.includes('resort') || model.includes('lodge');
+}
+
+function startLoading() {
+  const msgs = isHotelSearch() ? HOTEL_MSGS : PRODUCT_MSGS;
+  document.getElementById('resultsWrap').style.display = 'block';
+  document.getElementById('resultsTitle').textContent = 'SEARCHING';
+  document.getElementById('resultsCount').textContent = '';
+  document.getElementById('notice').style.display = 'none';
+  let i = 0;
+  document.getElementById('resultsBody').innerHTML = `
+    <div class="loading-state">
+      <div class="loading-dots"><span></span><span></span><span></span></div>
+      <div class="loading-text" id="loadMsg">${msgs[0]}</div>
+    </div>`;
+  msgTimer = setInterval(() => {
+    i = (i + 1) % msgs.length;
+    const el = document.getElementById('loadMsg');
+    if (el) el.textContent = msgs[i];
+  }, 900);
+}
+function stopLoading() { clearInterval(msgTimer); }
+
+// ── SEARCH ────────────────────────────────────────────────────
+async function doSearch() {
+  const category = document.getElementById('category').value;
+  const brand    = document.getElementById('brand').value;
+  const model    = document.getElementById('model').value.trim();
+  if (!category && !brand && !model) {
+    alert('Please select a category, location, or enter a name.'); return;
+  }
+
+  const btn = document.getElementById('searchBtn');
+  btn.disabled = true;
+  btn.innerHTML = `<span style="width:16px;height:16px;border:2px solid #0a0c0f;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span>&nbsp;Searching...`;
+  startLoading();
+
+  const product = [brand, category, model].filter(Boolean).join(' ');
+
+  try {
+    const res  = await fetch('/api/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ product })
+    });
+    const data = await res.json();
+    stopLoading();
+    if (!res.ok) throw new Error(data.error || 'Search failed');
+    renderResults(data.results || [], product, data.type === 'hotel');
+  } catch(err) {
+    stopLoading();
+    document.getElementById('resultsBody').innerHTML = `
+      <div class="empty-state">
+        <div style="font-size:36px;margin-bottom:12px">⚠️</div>
+        <div style="color:var(--red);font-weight:600;margin-bottom:8px">Search failed</div>
+        <div style="font-size:13px;font-family:var(--mono)">${err.message}</div>
+      </div>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Search Prices in Nepal`;
+}
+
+// ── RENDER RESULTS ────────────────────────────────────────────
+function renderResults(results, query, isHotel) {
+  const body = document.getElementById('resultsBody');
+  if (!Array.isArray(results) || results.length === 0) {
+    body.innerHTML = `<div class="empty-state"><div style="font-size:36px;margin-bottom:12px">🔍</div><div>No results found.<br/>Try a more specific name.</div></div>`;
+    return;
+  }
+
+  results.sort((a, b) => (Number(a.price)||0) - (Number(b.price)||0));
+  const prices  = results.map(r => Number(r.price)).filter(p => p > 0);
+  const minP    = Math.min(...prices);
+  const maxP    = Math.max(...prices);
+  const savings = maxP - minP;
+
+  document.getElementById('resultsTitle').textContent = isHotel ? 'HOTELS FOR' : 'RESULTS FOR';
+  document.getElementById('resultsCount').textContent = `${results.length} ${isHotel ? 'OPTIONS' : 'STORES'} · ${query.toUpperCase()}`;
+
+  let html = '';
+
+  if (results.length > 1 && savings > 0) {
+    html += `<div class="savings-bar">
+      <div class="sav-item"><div class="sav-label">${isHotel ? 'Cheapest/night' : 'Cheapest'}</div><div class="sav-val" style="color:var(--green)">Rs.${minP.toLocaleString()}</div></div>
+      <div class="sav-item"><div class="sav-label">${isHotel ? 'Most expensive' : 'Most expensive'}</div><div class="sav-val" style="color:var(--red)">Rs.${maxP.toLocaleString()}</div></div>
+      <div class="sav-item"><div class="sav-label">You save up to</div><div class="sav-val" style="color:var(--accent)">Rs.${savings.toLocaleString()}</div></div>
+      <div class="sav-item"><div class="sav-label">${isHotel ? 'Options' : 'Stores'} found</div><div class="sav-val" style="color:var(--text2)">${results.length}</div></div>
+    </div>`;
+  }
+
+  results.forEach((r, i) => {
+    const price   = Number(r.price) || 0;
+    const origP   = Number(r.original_price) || 0;
+    const cheap   = price === minP;
+    const pricey  = price === maxP && results.length > 1;
+    const hasD    = origP > price;
+    const discPct = hasD ? Math.round((1 - price/origP)*100) : 0;
+    const delay   = i * 0.05;
+
+    const tagHtml = (r.tags||[]).map(t => {
+      const tl = t.toLowerCase();
+      if (tl.includes('official')||tl.includes('authorized')||tl.includes('star'))
+        return `<span class="tag tag-official">${t}</span>`;
+      if (tl.includes('cod')||tl.includes('delivery')||tl.includes('breakfast')||tl.includes('wifi')||tl.includes('pool'))
+        return `<span class="tag tag-cod">${t}</span>`;
+      if (tl.includes('discount')||tl.includes('sale')||tl.includes('deal')||tl.includes('off'))
+        return `<span class="tag tag-deal">${t}</span>`;
+      return `<span class="tag tag-neutral">${t}</span>`;
+    }).join('');
+
+    const cheapTag = cheap ? `<span class="tag tag-cod">✓ ${isHotel ? 'Best Price' : 'Cheapest'}</span>` : '';
+    const rankIcon = ['①','②','③','④','⑤','⑥','⑦'][i] || (i+1)+'';
+    const cardCls  = `price-card${isHotel ? ' hotel' : ''}${cheap ? ' cheapest' : pricey ? ' priciest' : ''}`;
+    let safeUrl    = (r.url||'').startsWith('http') ? r.url : (r.url ? 'https://'+r.url : '#');
+    let hostname   = '';
+    try { hostname = new URL(safeUrl).hostname; } catch(e) {}
+
+    html += `<div class="${cardCls}" style="animation-delay:${delay}s" onclick="window.open('${safeUrl}','_blank')">
+      <div class="rank-num ${i===0?'first':''}">${rankIcon}</div>
+      <div class="store-info">
+        <div class="store-name">${r.store||'Store'}</div>
+        <div class="store-url">${hostname}</div>
+        <div class="store-tags">${tagHtml}${cheapTag}</div>
+        ${r.note ? `<div class="store-note">${r.note}</div>` : ''}
+      </div>
+      <div class="price-section">
+        <div class="price-val ${cheap?'green':''}">Rs.${price.toLocaleString()}</div>
+        ${isHotel ? `<div class="price-per-night">per night</div>` : ''}
+        ${hasD ? `<div class="price-orig">Rs.${origP.toLocaleString()}</div><div class="disc-badge">-${discPct}%</div>` : ''}
+        <a class="visit-link" href="${safeUrl}" target="_blank" onclick="event.stopPropagation()">${isHotel ? 'Book now →' : 'Visit store →'}</a>
+      </div>
+    </div>`;
+  });
+
+  body.innerHTML = html;
+
+  const notice = document.getElementById('notice');
+  notice.style.display = 'block';
+  notice.textContent = isHotel
+    ? '⚠ Hotel prices are estimates and may vary by date/season. Always verify on the booking platform before confirming.'
+    : '⚠ Prices are based on AI knowledge and may not reflect real-time availability. Always verify on the seller website before purchasing.';
+}
+
+// ── BANNER OFFERS ─────────────────────────────────────────────
+const COLOR_MAP = {
+  orange:'bc-orange', blue:'bc-blue', green:'bc-green',
+  purple:'bc-purple', red:'bc-red'
 };
 
-function trackSearch(product) {
-  stats.totalSearches++;
-  stats.recentSearches.unshift({ product, time: new Date().toISOString() });
-  if (stats.recentSearches.length > 50) stats.recentSearches.pop();
-  stats.popularProducts[product] = (stats.popularProducts[product] || 0) + 1;
-  const hour = new Date().toISOString().slice(0, 13);
-  stats.hourlySearches[hour] = (stats.hourlySearches[hour] || 0) + 1;
-}
-
-// ── Session store (admin only) ────────────────────────────────
-const sessions = new Map();
-const SESSION_TTL_MS = 4 * 60 * 60 * 1000;
-
-function createSession() {
-  const token = crypto.randomBytes(32).toString('hex');
-  sessions.set(token, Date.now() + SESSION_TTL_MS);
-  return token;
-}
-
-function isValidSession(token) {
-  if (!token || !sessions.has(token)) return false;
-  const expiry = sessions.get(token);
-  if (Date.now() > expiry) { sessions.delete(token); return false; }
-  sessions.set(token, Date.now() + SESSION_TTL_MS);
-  return true;
-}
-
-setInterval(() => {
-  const now = Date.now();
-  for (const [t, exp] of sessions) if (now > exp) sessions.delete(t);
-}, 30 * 60 * 1000);
-
-// ── Middleware ────────────────────────────────────────────────
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Rate limiter — 60 requests/min per IP
-const rateLimits = new Map();
-function rateLimit(req, res, next) {
-  const ip  = req.ip || req.connection.remoteAddress;
-  const now = Date.now();
-  const win = rateLimits.get(ip) || { count: 0, start: now };
-  if (now - win.start > 60000) { win.count = 0; win.start = now; }
-  win.count++;
-  rateLimits.set(ip, win);
-  if (win.count > 60) return res.status(429).json({ error: 'Too many requests. Please wait.' });
-  next();
-}
-
-// Auth middleware for admin routes
-function requireAuth(req, res, next) {
-  const token = req.headers['x-admin-token'] || req.query.token;
-  if (!isValidSession(token)) return res.status(401).json({ error: 'Unauthorized.' });
-  next();
-}
-
-// ── PUBLIC ROUTES ─────────────────────────────────────────────
-
-app.get('/api/health', (req, res) => res.json({ ok: true }));
-
-// POST /api/login — password check for admin
-app.post('/api/login', rateLimit, async (req, res) => {
-  const { password } = req.body || {};
-  if (!password) return res.status(400).json({ error: 'Password required.' });
-  const hash = process.env.ADMIN_PASSWORD_HASH;
-  if (!hash) return res.status(500).json({ error: 'Server misconfigured.' });
-  const match = await bcrypt.compare(password, hash);
-  if (!match) return res.status(401).json({ error: 'Incorrect password.' });
-  res.json({ token: createSession() });
-});
-
-// POST /api/search — PUBLIC, searches products or hotels
-app.post('/api/search', rateLimit, async (req, res) => {
-  const { product } = req.body || {};
-  if (!product || product.trim().length < 2)
-    return res.status(400).json({ error: 'Please provide a product or hotel name.' });
-
-  const GROQ_KEY = process.env.GROQ_API_KEY;
-  if (!GROQ_KEY) return res.status(500).json({ error: 'API not configured.' });
-
-  const query = product.trim().toLowerCase();
-  const isHotel = query.includes('hotel') || query.includes('resort') ||
-                  query.includes('lodge') || query.includes('inn') ||
-                  query.includes('homestay');
-
-  let systemPrompt;
-
-  if (isHotel) {
-    // Hotel/Resort search prompt
-    systemPrompt = `You are a Nepal hotel and resort price comparison expert. Return ONLY a valid JSON array of hotel/resort listings from Nepal booking sites: Booking.com Nepal, Agoda Nepal, Nepaltrekking.com, Tripadvisor Nepal, direct hotel websites, and local booking platforms.
-
-Each object must have:
-{
-  "store": "platform or hotel name",
-  "url": "booking URL",
-  "price": integer price in NPR per night,
-  "original_price": integer or null if no discount,
-  "tags": ["array of tags like Free Breakfast", "Free Wifi", "Pool", "Mountain View", "Book Direct"],
-  "in_stock": true or false (availability),
-  "note": "one sentence about the property or deal"
-}
-
-Rules: NPR prices only. Sort by price ascending. 3-6 results. Include star rating in tags if known. No markdown.`;
-  } else {
-    // Product search prompt
-    systemPrompt = `You are a Nepal e-commerce price comparison expert. Return ONLY a valid JSON array of prices from Nepali online stores: Daraz (daraz.com.np), SastoDeal (sastodeal.com), Gyapu (gyapu.com), Electromandu (electromandu.com), Kinaun (kinaun.com), Samsung Plaza (samsungplaza.com.np), Magic Mart (magicmartnepal.com), Thulo.com, OkDam (okdam.com), FatafatSewa (fatafatsewa.com).
-
-Each object must have:
-{
-  "store": "store display name",
-  "url": "full product URL",
-  "price": integer NPR price,
-  "original_price": integer or null,
-  "tags": ["array", "of", "tags"],
-  "in_stock": true or false,
-  "note": "one short sentence"
-}
-
-Rules: NPR prices only. Sort by price ascending. 3-7 results. No markdown.`;
-  }
-
+async function loadBannerOffers() {
   try {
-    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const res  = await fetch('/api/banner-offers', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        temperature: 0.15,
-        max_tokens: 1400,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Find ${isHotel ? 'hotel/resort prices' : 'prices'} for: ${product.trim()} in Nepal. JSON array only.` }
-        ]
-      })
+      headers: { 'Content-Type': 'application/json' }
     });
-
-    const data = await groqRes.json();
-    if (data.error) throw new Error(data.error.message || 'Groq error');
-
-    let raw = (data.choices?.[0]?.message?.content || '')
-      .replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
-    const match = raw.match(/\[[\s\S]*\]/);
-    const results = JSON.parse(match ? match[0] : raw);
-    trackSearch(product.trim());
-    res.json({ results, type: isHotel ? 'hotel' : 'product' });
-
-  } catch (err) {
-    stats.errors++;
-    res.status(500).json({ error: err.message || 'Search failed.' });
+    const data = await res.json();
+    if (data.offers && data.offers.length) {
+      renderBanners(data.offers);
+    } else {
+      renderBanners(getFallbackBanners());
+    }
+  } catch(e) {
+    renderBanners(getFallbackBanners());
   }
+}
+
+function renderBanners(offers) {
+  const grid = document.getElementById('bannerGrid');
+  grid.innerHTML = offers.map((o, i) => {
+    const colorClass = COLOR_MAP[o.color] || 'bc-blue';
+    const url = o.url || o.store_url || '#';
+    const delay = i * 0.07;
+    return `<a class="banner-card ${colorClass}" href="${url}" target="_blank" style="animation-delay:${delay}s">
+      <div>
+        <div class="bc-store-badge">${o.store}</div>
+        <div class="bc-title">${o.title}</div>
+        <div class="bc-desc">${o.description}</div>
+      </div>
+      <div>
+        <div class="bc-discount">${o.discount}</div>
+        <span class="bc-arrow">Shop now →</span>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+function getFallbackBanners() {
+  return [
+    { store:'Daraz', title:'Flash Sale Electronics', description:'Top brands at lowest prices', discount:'Up to 50% OFF', color:'orange', url:'https://www.daraz.com.np/campaigns/electronics-sale/' },
+    { store:'Daraz', title:'Fashion Week Nepal', description:'Clothes, shoes & accessories', discount:'Up to 60% OFF', color:'red', url:'https://www.daraz.com.np/campaigns/fashion/' },
+    { store:'Daraz', title:'Home & Kitchen Deals', description:'Upgrade your living space', discount:'Up to 40% OFF', color:'purple', url:'https://www.daraz.com.np/home-and-living/' },
+    { store:'Jeeva', title:'Fresh Grocery Offers', description:'Daily essentials delivered fast', discount:'Up to 25% OFF', color:'green', url:'https://www.jeeva.com.np' },
+    { store:'Jeeva', title:'Organic Products', description:'Healthy food at great prices', discount:'Up to 20% OFF', color:'green', url:'https://www.jeeva.com.np/organic' },
+    { store:'HamroBazaar', title:'Used Electronics', description:'Quality second-hand gadgets', discount:'Best Prices', color:'blue', url:'https://hamrobazaar.com/c-Electronics' },
+    { store:'HamroBazaar', title:'Vehicles For Sale', description:'Cars, bikes & scooters', discount:'Negotiate Price', color:'blue', url:'https://hamrobazaar.com/c-Vehicles' },
+    { store:'HamroBazaar', title:'Property Listings', description:'Buy, sell or rent property', discount:'Direct from Owner', color:'purple', url:'https://hamrobazaar.com/c-RealEstate' },
+    { store:'Daraz', title:'Mobile Phone Deals', description:'Latest smartphones on sale', discount:'Up to 35% OFF', color:'orange', url:'https://www.daraz.com.np/mobiles/' },
+  ];
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSearch();
 });
 
-// POST /api/banner-offers — PUBLIC, fetches real deals from Daraz, Jeeva, HamroBazaar
-app.post('/api/banner-offers', rateLimit, async (req, res) => {
-  const GROQ_KEY = process.env.GROQ_API_KEY;
-  if (!GROQ_KEY) return res.status(500).json({ error: 'API not configured.' });
-
-  try {
-    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        temperature: 0.4,
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: `Generate 9 realistic current promotional banner offers from these 3 specific Nepal online stores:
-- Daraz Nepal (daraz.com.np) — 3 offers
-- Jeeva (jeeva.com.np) — 3 offers  
-- HamroBazaar (hamrobazaar.com) — 3 offers
-
-Each offer should be a real-looking promotional banner deal with a discount.
-
-Respond ONLY with a valid JSON array, no markdown. Each item:
-{
-  "store": "Daraz" or "Jeeva" or "HamroBazaar",
-  "store_url": "homepage URL",
-  "title": "short catchy offer title (max 6 words)",
-  "description": "one line description of the deal",
-  "discount": "discount text e.g. Up to 40% OFF",
-  "category": "product category e.g. Electronics, Fashion, Home",
-  "color": "one of: orange, blue, green, purple, red",
-  "url": "realistic deal page URL on that store"
-}`
-        }]
-      })
-    });
-
-    const data = await groqRes.json();
-    let raw = (data.choices?.[0]?.message?.content || '')
-      .replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
-    const match = raw.match(/\[[\s\S]*\]/);
-    const offers = JSON.parse(match ? match[0] : raw);
-    res.json({ offers });
-
-  } catch(err) {
-    stats.errors++;
-    res.status(500).json({ error: 'Could not load banner offers.' });
-  }
+window.addEventListener('load', () => {
+  loadBannerOffers();
 });
-
-// POST /api/offers — kept for backward compatibility (ticker, now unused on frontend)
-app.post('/api/offers', rateLimit, async (req, res) => {
-  res.json({ offers: [] });
-});
-
-// ── ADMIN ROUTES (password protected) ────────────────────────
-
-app.get('/api/admin/stats', requireAuth, (req, res) => {
-  const uptimeMs  = Date.now() - new Date(stats.serverStartTime).getTime();
-  const uptimeHrs = Math.floor(uptimeMs / 3600000);
-  const uptimeMins = Math.floor((uptimeMs % 3600000) / 60000);
-
-  const topSearches = Object.entries(stats.popularProducts)
-    .sort((a, b) => b[1] - a[1]).slice(0, 10)
-    .map(([product, count]) => ({ product, count }));
-
-  const now = new Date();
-  const hourlyData = [];
-  for (let i = 23; i >= 0; i--) {
-    const d = new Date(now - i * 3600000);
-    const key = d.toISOString().slice(0, 13);
-    hourlyData.push({ hour: d.getHours() + ':00', count: stats.hourlySearches[key] || 0 });
-  }
-
-  res.json({
-    uptime: uptimeHrs + 'h ' + uptimeMins + 'm',
-    serverStartTime: stats.serverStartTime,
-    totalSearches: stats.totalSearches,
-    totalOfferLoads: stats.totalOfferLoads,
-    totalErrors: stats.errors,
-    activeSessions: sessions.size,
-    recentSearches: stats.recentSearches.slice(0, 20),
-    topSearches,
-    hourlyData,
-  });
-});
-
-// Serve admin panel
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin', 'index.html'));
-});
-
-// Catch-all → serve frontend
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// ── Start ─────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log('\n Nepal Price Finder running at http://localhost:' + PORT);
-  console.log(' Admin panel: http://localhost:' + PORT + '/admin');
-  console.log(' API key secured in .env — never exposed to browser\n');
-});
+</script>
+</body>
+</html>
