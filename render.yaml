@@ -2,9 +2,12 @@ services:
   - type: web
     name: nepal-price-finder
     env: node
+    region: oregon
     buildCommand: npm install
     startCommand: node server.js
     plan: free
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 3000
